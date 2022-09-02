@@ -1,0 +1,12 @@
+[build-system]
+requires = [
+    "setuptools",
+    "wheel",
+    "clint",
+    "requests",
+    "spacy==3.1.2",
+    "wordfreq",
+    "nltk",
+    "pip"
+]
+build-backend = "setuptools.build_meta"

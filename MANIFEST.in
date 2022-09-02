@@ -1,0 +1,15 @@
+include SHORTREADME.md
+include awe_workbench/parser/json_data/*
+include awe_workbench/languagetool/grammar.xml
+include awe_workbench/languagetool/grammar_en_us.xml
+include awe_workbench/languagetool/languagetool_rulemapping.json
+include awe_workbench/spellcorrect/aspell.txt
+global-include *.cfg
+global-include *.csv
+global-include *.json
+global-include *.txt
+global-include *.md
+global-include *.jar
+global-include *.bat
+global-include *.sh
+global-include LICENSE
