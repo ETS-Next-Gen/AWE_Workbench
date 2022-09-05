@@ -27,6 +27,25 @@ def initialize():
     return parser, lt
 
 
+def flattenViewpointList(vlist, tokens):
+    outlist = []
+    for key in vlist:
+        if key=='explicit_1' or key=='explicit_2':
+            for item in vlist[key]:
+                outlist.append(item)
+        else:
+            for subkey in vlist[key]:
+                for item in vlist[key][subkey]:
+                    outlist.append(item)
+    flagged = []
+    for i, token in enumerate(tokens):
+        if i in outlist:
+            flagged.append(True)
+        else:
+            flagged.append(False)
+    return flagged                
+         
+
 def fixMessage(message):
     message = message.replace('’', '&rsquo;')
     message = message.replace('‘', '&lsquo;')
@@ -41,9 +60,9 @@ def prepareSocialAwarenessDisplay(tokens, social_awareness):
         if '\n' in tokens[start]:
             start += 1
         end = item[1]
-        output += ' '.join(tokens[loc: start])
+        output += ' '.join(tokens[loc:start])
         output += ' <span style="background-color: yellow"> '
-        output += ' '.join(tokens[start: end])
+        output += ' '.join(tokens[start:end])
         output += ' </span> '
         loc = end
     output += ' '.join(tokens[loc:len(tokens)])
@@ -83,7 +102,9 @@ def prepareCharacterDisplay(characterList, tokenList):
                      'purple',
                      'cyan',
                      'grey',
-                     'yellow']
+                     'yellow',
+                     'mauve',
+                     'teal']
         if len(characterList[character]) > 2:
             for ref in characterList[character]:
                 if charNum < len(colorList):
@@ -121,6 +142,31 @@ def prepareConcreteDetailDisplay(tokens, details):
     return normalize(output)
 
 
+
+def countPastTokens(tense_changes, in_direct_speech):
+    numPastTokens = 0
+    for change in tense_changes:
+        present = False
+        newloc = change['loc']
+        present = False
+        newloc = change['loc']
+        if not change['past'] and not in_direct_speech[newloc]:
+            if not present:
+                numPastTokens += 1
+                newloc = change['loc']
+                present = True
+                loc = newloc
+            else:
+                newloc = change['loc']
+                present = True
+                loc = newloc
+        else:
+            newloc = change['loc']
+            present = False
+            loc = newloc+1
+    return numPastTokens
+
+
 def prepareSceneDisplay(tokens,
                         transitions,
                         in_direct_speech,
@@ -130,50 +176,61 @@ def prepareSceneDisplay(tokens,
     temp = []
     numComments = 0
     present = False
-    for change in tense_changes:
-        present = False
-        newloc = change['loc']
-        if not change['past'] and not in_direct_speech[newloc]:
-            if not present:
-                newloc = change['loc']
-                temp += tokens[loc:newloc-1]
-                temp.append('<strong style="background-color: #c39bd3">')
-                present = True
-                numComments += 1
-                loc = newloc
+    numPastTokens = countPastTokens(tense_changes, in_direct_speech)
+
+    print('proportion past tense tokens:', numPastTokens * 1.0 / len(tokens))
+
+    # Only makes sense to treat present tense as comments/interjections
+    # if it's a small percentage of the total
+    if numPastTokens * 1.0 / len(tokens) < 0.3 and len(tense_changes)>0:
+        for change in tense_changes:
+            present = False
+            newloc = change['loc']
+            if not change['past'] and not in_direct_speech[newloc]:
+                if not present:
+                    newloc = change['loc']
+                    temp += tokens[loc:newloc-1]
+                    temp.append('<strong style="background-color: #c39bd3">')
+                    present = True
+                    numComments += 1
+                    loc = newloc
+                else:
+                    newloc = change['loc']
+                    temp += tokens[loc:newloc]
+                    present = True
+                    loc = newloc
             else:
                 newloc = change['loc']
                 temp += tokens[loc:newloc]
-                present = True
-                loc = newloc
-        else:
-            newloc = change['loc']
-            temp += tokens[loc: newloc]
-            if newloc > 0:
-                temp.append('</strong>' + tokens[newloc])
+                if newloc > 0:
+                    temp.append('</strong>' + tokens[newloc])
+                else:
+                    temp.append(tokens[newloc])
+                present = False
+                loc = newloc+1
+            temp += tokens[loc:len(tokens)-1]
+            if present:
+                temp.append('</strong>' + tokens[len(tokens)-1])
             else:
-                temp.append(tokens[newloc])
-            present = False
-            loc = newloc+1
-    temp += tokens[loc:len(tokens)-1]
-    if present:
-        temp.append('</strong>' + tokens[len(tokens)-1])
+                temp.append(tokens[len(tokens)-1])
     else:
-        temp.append(tokens[len(tokens)-1])
+        temp = tokens
 
     loc = 0
     temp2 = []
     inLoc = False
-    for i, locFlag in enumerate(locations):
-        if not inLoc and locFlag:
-            temp2.append('<span style="background-color: yellow">'
-                         + temp[i])
-            inLoc = True
-        elif inLoc and not locFlag:
-            temp2.append('</span>' + temp[i])
-            inLoc = False
-        else:
-            temp2.append(temp[i])
+    print(locations, len(tokens), len(temp))
+    if locations is not None:
+        for i, locFlag in enumerate(locations):
+            if not inLoc and locFlag:
+                temp2.append('<span style="background-color: yellow">'
+                             + temp[i])
+                inLoc = True
+            elif inLoc and not locFlag:
+                temp2.append('</span>' + temp[i])
+                inLoc = False
+            else:
+                temp2.append(temp[i])
     temp = temp2
     loc = 0
     output = ''
@@ -182,13 +239,13 @@ def prepareSceneDisplay(tokens,
         start = transition[2]
         end = transition[3]
         if transition[4] != 'temporal' or in_direct_speech[start]:
-            output += ' '.join(temp[loc: end]) + ' '
+            output += ' '.join(temp[loc:end]) + ' '
             loc = end
         else:
-            output += ' '.join(temp[loc: breakloc])
+            output += ' '.join(temp[loc:breakloc])
             output += ' '.join(temp[breakloc:start])
             output += ' <span style="background-color: #90ee90"> '
-            output += ' '.join(temp[start: end + 1])
+            output += ' '.join(temp[start:end + 1])
             output += ' </span> '
             loc = end + 1
     output += ' '.join(temp[loc:len(temp)])
@@ -213,12 +270,12 @@ def displayDialogue(tokens, quoted, directspeech):
     for (speakers, addressees, locs) in directspeech:
         for loc in locs:
             last = loc[0]
-            tokens2.append(' '.join(tokens[first: last]))
+            tokens2.append(' '.join(tokens[first:last]))
 
             first = loc[0]
             x = first
 
-            last = loc[1] + 1
+            last = loc[1]+1
             y = last
             if first < len(tokens) \
                and re.match('\s+', tokens[first]):
@@ -227,13 +284,21 @@ def displayDialogue(tokens, quoted, directspeech):
                    and not quoted[first]
                    and not re.match('\s+', tokens[first])
                    and tokens[first] != '"'
+                   and tokens[first] != "'"
+                   and tokens[first] != "''"
+                   and tokens[first] != '``'
                    and tokens[first] != '”'
+                   and tokens[first] != '“'
                    and first <= last):
                 first += 1
 
             while (not quoted[last - 1]
-                   and tokens[last-1] != '"'
-                   and tokens[last-1] != '”'
+                   and tokens[last - 1] != '"'
+                   and tokens[last - 1] != "'"
+                   and tokens[last - 1] != "''"
+                   and tokens[last - 1] != '``'
+                   and tokens[last - 1] != '”'
+                   and tokens[last - 1] != '“'
                    and last > 0
                    and first < last):
                 last -= 1
@@ -242,7 +307,7 @@ def displayDialogue(tokens, quoted, directspeech):
                     tokens2.append(' ' + tokens[x])
                     x += 1
                 tokens2.append(' <span style="background-color: #90ee90">'
-                               + ' '.join(tokens[x: first])
+                               + ' '.join(tokens[x:first])
                                + '</span> ')
             while (first < len(tokens)
                    and re.match('\s+', tokens[first])):
@@ -256,8 +321,8 @@ def displayDialogue(tokens, quoted, directspeech):
                            + '</span> ')
             last = first
             first = loc[1] + 1
-    tokens2.append(' '.join(tokens[first: len(tokens) - 1]))
-    tokens2 = normalize(''.join(tokens2))
+    tokens2.append(' '.join(tokens[first:len(tokens) - 1]))
+    tokens2 = normalize(''.join(tokens2)).replace('\n','<br />')
     return tokens2
 
 
@@ -279,15 +344,15 @@ def prepareCompoundComplexDisplay(ccd,
             if opt1:
                 outhtml += '<span style="font-style: bold;' \
                            + ' background-color: #AFEEEE">' \
-                           + normalize(' '.join(tokens[sent[0]: sent[1]])) \
+                           + normalize(' '.join(tokens[sent[0]:sent[1]])) \
                            + '</span> '
             else:
                 outhtml += normalize(' '.join(tokens[sent[0]:sent[1]])) + ' '
         elif ccd[i] == 2:
             if opt2:
                 outhtml += '<span style="font-style: bold;' \
-                         + ' background-color: #AFEEEE">' + \
-                         + normalize(' '.join(tokens[sent[0]: sent[1]])) + \
+                         + ' background-color: #AFEEEE">' \
+                         + normalize(' '.join(tokens[sent[0]:sent[1]]))	 \
                          + '</span> '
             else:
                 outhtml += normalize(' '.join(tokens[sent[0]:sent[1]])) + ' '
@@ -295,7 +360,7 @@ def prepareCompoundComplexDisplay(ccd,
             if opt3:
                 outhtml += '<span style="font-style: bold;' \
                            + ' background-color: #AFEEEE">' \
-                           + normalize(' '.join(tokens[sent[0]: sent[1]])) \
+                           + normalize(' '.join(tokens[sent[0]:sent[1]])) \
                            + '</span> '
             else:
                 outhtml += normalize(' '.join(tokens[sent[0]:sent[1]])) + ' '
@@ -314,7 +379,7 @@ def prepareCompoundComplexDisplay(ccd,
                            + normalize(' '.join(tokens[sent[0]:sent[1]])) \
                            + '</span> '
             else:
-                outhtml += normalize(' '.join(tokens[sent[0]: sent[1]]))
+                outhtml += normalize(' '.join(tokens[sent[0]:sent[1]]))
 
         elif ccd[i] == 6:
             if opt6:
@@ -333,7 +398,7 @@ def prepareCompoundComplexDisplay(ccd,
             else:
                 outhtml += normalize(' '.join(tokens[sent[0]:sent[1]])) + ' '
         else:
-            outhtml += normalize(' '.join(tokens[sent[0]: sent[1]])) \
+            outhtml += normalize(' '.join(tokens[sent[0]:sent[1]])) \
                           + ' '
     outhtml += '</body></html>'
     outhtml = outhtml.replace('\n', '<br />')
@@ -622,7 +687,7 @@ def prepareSupportingIdeas(ec):
         outhtml += normalize(' '.join(tokens[lastoffset:item[0]]))
         outhtml += '<span style="font-style: bold;' \
                    + ' background-color: #AFEEEE">' \
-                   + normalize(' '.join(tokens[item[0]: item[1]])) \
+                   + normalize(' '.join(tokens[item[0]:item[1]])) \
                    + '</span>'
         lastoffset = item[1]
     outhtml += normalize(' '.join(tokens[lastoffset:]))
@@ -826,7 +891,7 @@ def prepareTransitionMarking(tokens,
 
         if item[4] != 'PARAGRAPH' and item[3] not in covered:
             if '>' in temp[start]:
-                left = temp[start][0: temp[start].index('>') + 1]
+                left = temp[start][0:temp[start].index('>') + 1]
                 right = temp[start][temp[start].index('>') + 1:]
                 if '\n' not in temp[start]:
                     output += left
@@ -886,7 +951,7 @@ def prepareTransitionMarking(tokens,
         lastStart = sentenceStart
         if item[3] not in covered:
             covered.append(item[3])
-    output += ' '.join(temp[loc: len(tokens)])
+    output += ' '.join(temp[loc:len(tokens)])
     return prefix + normalize(output)
 
 
@@ -1033,7 +1098,7 @@ def prepareArgumentWordMarking(tokens,
             output += ' </span> '
             inSpan = False
         loc = item+1
-    output += ' '.join(temp[loc: len(temp)])
+    output += ' '.join(temp[loc:len(temp)])
     output = output.replace('</div></span>', '</span></div>')
     output = output.replace('</div> </span>', '</span></div>')
     output = output.replace('<span style="text-decoration: underline">'
@@ -1435,7 +1500,6 @@ print('--------------------------\n\n\n\n')
 for i, dl in enumerate(document_labels):
     if dl not in labels:
         [text] = spellcorrect.send([documents[i]])
-        print('parsing', dl, text)
         ok = parser.send(['PARSEONE', dl, text])
 
 [ctext] = spellcorrect.send([document_text])
@@ -1996,8 +2060,18 @@ percentCharacter = \
 print('Percent character trait words: ',
       percentCharacter)
 
-directspeech = parser.send(['DIRECTSPEECHSPANS',
-                           document_label])
+#emotions = parser.send(['EMOTIONALSTATES',
+#                       document_label])
+#em = flattenViewpointList(emotions, tokens)
+#emotionDisplay = prepareEmotionDisplay(em, tokens)
+
+#traits = parser.send(['CHARACTERTRAITS',
+#                     document_label])
+#ct = flattenViewpointList(traits, tokens)                       
+#traitDisplay = prepareEmotionDisplay(ct, tokens)
+
+
+directspeech = parser.send(['DIRECTSPEECHSPANS', document_label])
 
 countDirect = 0
 for item in directspeech:
@@ -2223,3 +2297,4 @@ elif option2 == 'Concrete Details':
     st.write(concreteDetailPage, unsafe_allow_html=True)
 elif option2 == 'Tone':
     st.write(tonePage, unsafe_allow_html=True)
+

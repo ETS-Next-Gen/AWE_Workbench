@@ -96,7 +96,7 @@ def displayDialogue(tokens, quoted, directspeech):
             first = loc[0]
             x = first
 
-            last = loc[1] + 1
+            last = loc[1]+1
             y = last
             if first < len(tokens) \
                and re.match('\s+', tokens[first]):
@@ -105,13 +105,21 @@ def displayDialogue(tokens, quoted, directspeech):
                    and not quoted[first]
                    and not re.match('\s+', tokens[first])
                    and tokens[first] != '"'
+                   and tokens[first] != "'"
+                   and tokens[first] != "''"
+                   and tokens[first] != '``'
                    and tokens[first] != '”'
+                   and tokens[first] != '“'
                    and first <= last):
                 first += 1
 
-            while (not quoted[last-1]
+            while (not quoted[last - 1]
                    and tokens[last-1] != '"'
+                   and tokens[last-1] != "'"
+                   and tokens[last-1] != "''"
+                   and tokens[last-1] != '``'
                    and tokens[last-1] != '”'
+                   and tokens[last-1] != '“'
                    and last > 0
                    and first < last):
                 last -= 1
@@ -120,7 +128,7 @@ def displayDialogue(tokens, quoted, directspeech):
                     tokens2.append(' ' + tokens[x])
                     x += 1
                 tokens2.append(' <span style="background-color: #90ee90">'
-                               + ' '.join(tokens[x: first])
+                               + ' '.join(tokens[x:first])
                                + '</span> ')
             while (first < len(tokens)
                    and re.match('\s+', tokens[first])):
@@ -134,8 +142,8 @@ def displayDialogue(tokens, quoted, directspeech):
                            + '</span> ')
             last = first
             first = loc[1] + 1
-    tokens2.append(' '.join(tokens[first: len(tokens) - 1]))
-    tokens2 = normalize(''.join(tokens2))
+    tokens2.append(' '.join(tokens[first:len(tokens) - 1]))
+    tokens2 = normalize(''.join(tokens2)).replace('\n','<br />')
     return tokens2
 
 
@@ -424,13 +432,16 @@ elif option2 == 'Personal Narrative':
 
 ok = parser.send(['PARSEONE', document_label, document_text])
 tokens = parser.send(['DOCTOKENS', document_label])
+print(tokens)
 quoted = parser.send(['QUOTEDTEXT', document_label])
+
 animates = parser.send(['ANIMATES', document_label])
 clusters = parser.send(['CLUSTERS', document_label])
 [characters, otherRefs] = parser.send(['NOMINALREFERENCES',
                                       document_label])
-directspeech = parser.send(['DIRECTSPEECHSPANS',
-                           document_label])
+print(document_label)
+directspeech = parser.send(['DIRECTSPEECHSPANS', document_label])
+print(directspeech)
 emotions = parser.send(['EMOTIONALSTATES',
                        document_label])
 traits = parser.send(['CHARACTERTRAITS',
@@ -507,3 +518,5 @@ elif option == 'Concrete Details':
     st.write(tokens8, unsafe_allow_html=True)
 else:
     st.write(document_text)
+    
+print(quoted)

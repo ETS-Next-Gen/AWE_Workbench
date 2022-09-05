@@ -27,7 +27,7 @@ class parserServer:
 
         asyncio.get_event_loop().run_until_complete(
             websockets.serve(self.run_parser, 'localhost', 8766))
-        print('running')
+        print('parser running')
         asyncio.get_event_loop().run_forever()
         print('died')
 
