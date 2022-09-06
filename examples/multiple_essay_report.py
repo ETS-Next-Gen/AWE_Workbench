@@ -142,124 +142,101 @@ def prepareConcreteDetailDisplay(tokens, details):
     return normalize(output)
 
 
-
-def countPastTokens(tense_changes, in_direct_speech):
-    numPastTokens = 0
-    for change in tense_changes:
-        present = False
-        newloc = change['loc']
-        present = False
-        newloc = change['loc']
-        if not change['past'] and not in_direct_speech[newloc]:
-            if not present:
-                numPastTokens += 1
-                newloc = change['loc']
-                present = True
-                loc = newloc
-            else:
-                newloc = change['loc']
-                present = True
-                loc = newloc
-        else:
-            newloc = change['loc']
-            present = False
-            loc = newloc+1
-    return numPastTokens
-
-
-def prepareSceneDisplay(tokens,
-                        transitions,
-                        in_direct_speech,
-                        tense_changes,
-                        locations):
+def prepareSceneDisplay(tokens, transitions, in_direct_speech, tense_changes,locations):
     loc = 0
     temp = []
     numComments = 0
     present = False
-    numPastTokens = countPastTokens(tense_changes, in_direct_speech)
-
-    print('proportion past tense tokens:', numPastTokens * 1.0 / len(tokens))
-
-    # Only makes sense to treat present tense as comments/interjections
-    # if it's a small percentage of the total
-    if numPastTokens * 1.0 / len(tokens) < 0.3 and len(tense_changes)>0:
-        for change in tense_changes:
-            present = False
-            newloc = change['loc']
-            if not change['past'] and not in_direct_speech[newloc]:
-                if not present:
-                    newloc = change['loc']
-                    temp += tokens[loc:newloc-1]
-                    temp.append('<strong style="background-color: #c39bd3">')
-                    present = True
-                    numComments += 1
-                    loc = newloc
-                else:
-                    newloc = change['loc']
-                    temp += tokens[loc:newloc]
-                    present = True
-                    loc = newloc
+    startHighlight = 0
+    numPastTokens = 0
+    lastchange = None
+    for change in tense_changes:
+        if lastchange is not None \
+           and (not change['past']
+                or in_direct_speech[change['loc']]
+                or tokens[lastchange['loc']] 
+                in ['"', '"', "'", '“', '”', "''", '``']):
+            numPastTokens += change['loc'] - lastchange['loc']
+        present = False
+        newloc = change['loc']
+        if not change['past'] and not in_direct_speech[newloc]:
+            startHighlight = newloc
+            if not present:
+                newloc = change['loc']
+                temp += tokens[loc:newloc]
+                temp.append('<strong style="background-color: #c39bd3">')
+                present = True
+                numComments += 1
+                loc = newloc
             else:
                 newloc = change['loc']
                 temp += tokens[loc:newloc]
-                if newloc > 0:
-                    temp.append('</strong>' + tokens[newloc])
-                else:
-                    temp.append(tokens[newloc])
-                present = False
-                loc = newloc+1
-            temp += tokens[loc:len(tokens)-1]
-            if present:
-                temp.append('</strong>' + tokens[len(tokens)-1])
+                present = True
+                loc = newloc
+        else:
+            newloc = change['loc']
+            temp += tokens[loc:newloc]
+            if newloc>0:
+                temp.append('</strong>'+tokens[newloc])
             else:
-                temp.append(tokens[len(tokens)-1])
+                temp.append(tokens[newloc])
+            present = False         
+            loc = newloc+1
+        lastchange = change
+    temp += tokens[loc:len(tokens)-1]
+    if present:
+        temp.append('</strong>' + tokens[len(tokens)-1])
     else:
-        temp = tokens
+        temp.append(tokens[len(tokens)-1])
 
+    print('num past tokens: ', numPastTokens)
+    if numPastTokens * 1.0 / len(tokens) < .6 or numComments <= 1:
+        temp = tokens
+       
     loc = 0
     temp2 = []
     inLoc = False
-    print(locations, len(tokens), len(temp))
-    if locations is not None:
-        for i, locFlag in enumerate(locations):
-            if not inLoc and locFlag:
-                temp2.append('<span style="background-color: yellow">'
-                             + temp[i])
-                inLoc = True
-            elif inLoc and not locFlag:
-                temp2.append('</span>' + temp[i])
-                inLoc = False
-            else:
-                temp2.append(temp[i])
+    lastLoc = 0
+    for i, locFlag in enumerate(locations):    
+        lastLoc = i
+        if not inLoc and locFlag:
+            temp2.append('<span style="background-color: yellow">'+temp[i])
+            inLoc = True
+        elif inLoc and not locFlag:
+            temp2.append('</span>' + temp[i])
+            inLoc = False
+        else:
+            temp2.append(temp[i])
+    while lastLoc < len(temp):
+        temp2.append(temp[lastLoc])
+        lastLoc+=1
     temp = temp2
+
     loc = 0
     output = ''
     for transition in transitions:
         breakloc = transition[1]
         start = transition[2]
         end = transition[3]
-        if transition[4] != 'temporal' or in_direct_speech[start]:
+        if transition[4] != 'temporal' or in_direct_speech[start]: 
             output += ' '.join(temp[loc:end]) + ' '
             loc = end
         else:
             output += ' '.join(temp[loc:breakloc])
+            #output += '<hr>'
             output += ' '.join(temp[breakloc:start])
             output += ' <span style="background-color: #90ee90"> '
-            output += ' '.join(temp[start:end + 1])
+            output += ' '.join(temp[start:end+1])
             output += ' </span> '
-            loc = end + 1
+            loc = end+1
     output += ' '.join(temp[loc:len(temp)])
-    headstr = '<ul><li><span style="background-color: #90ee90">' \
-              + 'Times</span></li><li>' \
-              + '<span style="background-color: yellow">Places</span>'
-    if len(tense_changes) > 1:
-        headstr += '<li><span style="background-color: #c39bd3">' \
-                    + 'Comments</span></li>'
+    headstr = '<ul><li><span style="background-color: #90ee90">Times</span></li><li><span style="background-color: yellow">Places</span>'
+    if numPastTokens * 1.0 / len(tokens) >= .6 and numComments > 1:
+        headstr += '<li><span style="background-color: #c39bd3">Comments</span></li>'
     headstr += '</ul><hr>'
     outhtml = '<!DOCTYPE html><html><head></head><body>'
     outhtml += headstr
-    outhtml += normalize(output.replace('  ',
-                                        ' ').replace('\n', '<br />'))
+    outhtml += normalize(output.replace('  ',' ').replace('\n','<br />'))
     outhtml += '</body></html>'
     return outhtml, numComments
 
