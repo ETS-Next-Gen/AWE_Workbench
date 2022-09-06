@@ -5,27 +5,33 @@ import holmes_extractor.manager
 import holmes_extractor.ontology
 from holmes_extractor.manager import Manager
 from holmes_extractor.ontology import Ontology
-from awe_workbench_components.components.utility_functions \
+from awe_components.components.utility_functions \
     import print_parse_tree
 
-pipeline_def = [('spacytextblob',
-                 'spacytextblob',
-                 'spacytextblob'),
-                ('awe_workbench_components.components',
-                 'lexicalFeatures',
-                 'lexicalfeatures'),
-                ('awe_workbench_components.components',
-                 'syntaxDiscourseFeats',
-                 'syntaxdiscoursefeatures'),
-                ('awe_workbench_components.components',
-                 'viewpointFeatures',
-                 'viewpointfeatures'),
-                ('awe_workbench_components.components',
-                 'lexicalClusters',
-                 'lexicalclusters'),
-                ('awe_workbench_components.components',
-                 'contentSegmentation',
-                 'contentsegmentation')]
+pipeline_def = [{'package': 'spacytextblob',
+                 'module': 'spacytextblob',
+                 'component': 'spacytextblob',
+                 'language': 'en'},
+                {'package': 'awe_components.components',
+                 'module': 'lexicalFeatures',
+                 'component': 'lexicalfeatures',
+                 'language': 'en'},
+                {'package': 'awe_components.components',
+                 'module': 'syntaxDiscourseFeats',
+                 'component': 'syntaxdiscoursefeatures',
+                 'language': 'en'},
+                {'package': 'awe_components.components',
+                 'module': 'viewpointFeatures',
+                 'component': 'viewpointfeatures',
+                 'language': 'en'},
+                {'package': 'awe_components.components',
+                 'module': 'lexicalClusters',
+                 'component': 'lexicalclusters',
+                 'language': 'en'},
+                {'package': 'awe_components.components',
+                 'module': 'contentSegmentation',
+                 'component': 'contentsegmentation',
+                 'language': 'en'}]
 
 parser = holmes_extractor.manager.Manager(
             model='en_core_web_lg',

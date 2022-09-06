@@ -23,11 +23,11 @@ class data:
         if install:
             os.system('python -m pylt_classifier.setup.data --install')
             os.system('python -m aggr_spellcorrect.setup.data --install')
-            os.system('python -m awe_workbench_components.setup.data --install')
+            os.system('python -m awe_components.setup.data --install')
         elif develop:
             os.system('python -m pylt_classifier.setup.data --develop')
             os.system('python -m aggr_spellcorrect.setup.data --develop')
-            os.system('python -m awe_workbench_components.setup.data --develop')
+            os.system('python -m awe_components.setup.data --develop')
 
     def __init__(self, args):
         if args.install or args.develop:

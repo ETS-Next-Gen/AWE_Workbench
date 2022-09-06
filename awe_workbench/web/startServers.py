@@ -20,24 +20,30 @@ class startServers:
     def __init__(self):
         queue = Queue()
 
-        pipeline_def=[('spacytextblob',
-                       'spacytextblob',
-                       'spacytextblob'),
-                      ('awe_workbench_components.components',
-                       'lexicalFeatures',
-                       'lexicalfeatures'),
-                      ('awe_workbench_components.components',
-                       'syntaxDiscourseFeats',
-                       'syntaxdiscoursefeatures'),
-                      ('awe_workbench_components.components',
-                       'viewpointFeatures',
-                       'viewpointfeatures'),
-                      ('awe_workbench_components.components',
-                       'lexicalClusters',
-                       'lexicalclusters'),
-                      ('awe_workbench_components.components',
-                       'contentSegmentation',
-                       'contentsegmentation')]
+        pipeline_def = [{'package': 'spacytextblob',
+                         'module': 'spacytextblob',
+                         'component': 'spacytextblob',
+                         'language': 'en'},
+                        {'package': 'awe_components.components',
+                         'module': 'lexicalFeatures',
+                         'component': 'lexicalfeatures',
+                         'language': 'en'},
+                        {'package': 'awe_components.components',
+                         'module': 'syntaxDiscourseFeats',
+                         'component': 'syntaxdiscoursefeatures',
+                         'language': 'en'},
+                        {'package': 'awe_components.components',
+                         'module': 'viewpointFeatures',
+                         'component': 'viewpointfeatures',
+                         'language': 'en'},
+                        {'package': 'awe_components.components',
+                         'module': 'lexicalClusters',
+                         'component': 'lexicalclusters',
+                         'language': 'en'},
+                        {'package': 'awe_components.components',
+                         'module': 'contentSegmentation',
+                         'component': 'contentsegmentation',
+                        'language': 'en'}]
 
         # Notes on the modules called here to be added to our parser pipeline
 
@@ -77,7 +83,7 @@ class startServers:
         # contentSegmentation
         # module that rougly identifies main ideas/supporting ideas/details in
         # argument-style texts.
-    
+   
         p1 = Process(target=pylt_classifier.languagetoolServer.runServer, args=())
         p1.start()
 
