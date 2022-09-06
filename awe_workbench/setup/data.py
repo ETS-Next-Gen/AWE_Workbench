@@ -1,4 +1,5 @@
-#!/usr/bin/env python3.9
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
 
 import argparse
 import os
@@ -21,12 +22,12 @@ class data:
         # Location is different depending on whether we're in install or
         # develop mode.
         if install:
-            os.system('python -m pylt_classifier.setup.data --install')
-            os.system('python -m aggr_spellcorrect.setup.data --install')
+            os.system('python -m awe_languagetool.setup.data --install')
+            os.system('python -m awe_spellcorrect.setup.data --install')
             os.system('python -m awe_components.setup.data')
         elif develop:
-            os.system('python -m pylt_classifier.setup.data --develop')
-            os.system('python -m aggr_spellcorrect.setup.data --develop')
+            os.system('python -m awe_languagetool.setup.data --develop')
+            os.system('python -m awe_spellcorrect.setup.data --develop')
             os.system('python -m awe_components.setup.data')
 
     def __init__(self, args):

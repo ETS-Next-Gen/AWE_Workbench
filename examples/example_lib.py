@@ -1,3 +1,6 @@
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
+
 import collections
 import math
 import re
@@ -5,7 +8,7 @@ import colorama  # https://pypi.org/project/blessings/ <-- This looks better?
 import sys
 
 from awe_workbench.web.websocketClient import websocketClient
-from pylt_classifier.languagetoolClient import languagetoolClient
+from awe_languagetool.languagetoolClient import languagetoolClient
 
 colorama.init()
 

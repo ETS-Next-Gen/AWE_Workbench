@@ -1,3 +1,6 @@
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
+
 '''
 This script takes unmasked essays and extracts Paul's features from them
 '''

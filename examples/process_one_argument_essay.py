@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
+
 import csv
 import re
 import os
@@ -9,7 +11,7 @@ import pandas as pd
 import random
 import threading
 from awe_workbench.web.websocketClient import websocketClient
-from pylt_classifier.languagetoolClient import languagetoolClient
+from awe_languagetool.languagetoolClient import languagetoolClient
 import nltk
 from nltk.corpus import stopwords
 

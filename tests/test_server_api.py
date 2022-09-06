@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
+
 import pickle
 import base64
 import math
@@ -11,11 +13,11 @@ import threading
 import unittest
 from multiprocessing import Process, Queue
 
-import awe_workbench.languagetool.languagetoolServer
-import awe_workbench.spellcorrect.spellcorrectServer
+import awe_languagetool.languagetoolServer
+import awe_spellcorrect.spellcorrectServer
 import awe_workbench.web.parserServer
 from awe_workbench.web.websocketClient import websocketClient
-from awe_workbench.languagetool.languagetoolClient import languagetoolClient
+from awe_languagetool.languagetoolClient import languagetoolClient
 
 def startServers():
     queue = Queue()

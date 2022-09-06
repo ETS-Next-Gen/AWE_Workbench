@@ -1,5 +1,5 @@
-pylt_classifier
-aggr_spellcorrect
+awe_languagetool
+awe_spellcorrect
 awe_components
 awe_lexica
 holmes_extractor

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
+
 '''
 This script replaces Kaggle masks in essays with plausible replacements from
 a Transformer model.

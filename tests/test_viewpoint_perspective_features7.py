@@ -1,6 +1,9 @@
-import awe_workbench.parser.manager as holmes
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
+
+import holmes_extractor.manager as holmes
 import unittest
-from awe_workbench.parser.components.utility_functions import print_parse_tree
+from awe_components.utility_functions import print_parse_tree
 
 holmes_manager = holmes.Manager(
     'en_core_web_lg', perform_coreference_resolution=False, number_of_workers=2)

@@ -1,8 +1,11 @@
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
+
 import streamlit as st
 import re
 from annotated_text import annotated_text
 from awe_workbench.web.websocketClient import websocketClient
-from pylt_classifier.languagetoolClient import languagetoolClient
+from awe_languagetool.languagetoolClient import languagetoolClient
 
 
 def initialize():

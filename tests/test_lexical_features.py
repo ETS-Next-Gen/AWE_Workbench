@@ -1,4 +1,7 @@
-import awe_workbench.parser.manager as holmes
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
+
+import holmes_extractor.manager as holmes
 import unittest
 
 holmes_manager = holmes.Manager(

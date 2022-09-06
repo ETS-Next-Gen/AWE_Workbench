@@ -1,10 +1,13 @@
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
+
 from multiprocessing import Process, Queue
 
 import os
 import time
 
-import pylt_classifier.languagetoolServer
-import aggr_spellcorrect.spellcorrectServer
+import awe_languagetool.languagetoolServer
+import awe_spellcorrect.spellcorrectServer
 import awe_workbench.web.parserServer
 import argparse
 
@@ -52,10 +55,8 @@ class startServers:
         # wrapper for TextBlob, https://github.com/sloria/TextBlob, which offers other NLP services.
         # but the sentiment features contribute something that Spacy does not come with out of the box.
         # SpacyTextBlob sentiment analysis gives subjectivity dimension, not just positive/negative polarity
-        # To get this to work with holmes, we need to add this import to manager.py 
-        # in the holmes install, plus add it as a pipe when the pipeline is initialized
-        # Modified spacytextblob file, manager.py, is included in set of files needed to get
-        # this system to work.
+        # To get this to work with holmes, we need to use forked version of holmes extractor that
+        # supports insertion of spacy components into it spacy pipeline.
         #
         # lexicalFeatures
         # Module that adds features reflecting lexical properties to tokens, including
@@ -84,10 +85,10 @@ class startServers:
         # module that rougly identifies main ideas/supporting ideas/details in
         # argument-style texts.
    
-        p1 = Process(target=pylt_classifier.languagetoolServer.runServer, args=())
+        p1 = Process(target=awe_languagetool.languagetoolServer.runServer, args=())
         p1.start()
 
-        p2 = Process(target=aggr_spellcorrect.spellcorrectServer.spellcorrectServer, args=())
+        p2 = Process(target=awe_spellcorrect.spellcorrectServer.spellcorrectServer, args=())
         p2.start()
 
         p3 = Process(target=awe_workbench.web.parserServer.parserServer,

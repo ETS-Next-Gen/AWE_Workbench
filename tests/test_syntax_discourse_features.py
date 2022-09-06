@@ -1,5 +1,8 @@
-import awe_workbench.parser.manager as holmes
-from awe_workbench.parser.components.utility_functions import print_parse_tree
+#!/usr/bin/env python3.10
+# Copyright 2022, Educational Testing Service
+
+import holmes_extractor.manager as holmes
+from awe_components.utility_functions import print_parse_tree
 import unittest
 import json
 
