@@ -1,8 +1,12 @@
-aggr_spellcorrect
 pylt_classifier
-tensorflow
+aggr_spellcorrect
+awe_components
+awe_lexica
+holmes_extractor
+coreferee
 spacy
 spacytextblob <= 3.0.1
+tensorflow
 scipy
 sklearn
 bs4
@@ -32,7 +36,6 @@ tensorboard-data-server
 h5py
 typing-extensions
 six
-coreferee
 clint
 requests
 names
