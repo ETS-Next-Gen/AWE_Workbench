@@ -9,31 +9,7 @@ from holmes_extractor.manager import Manager
 from holmes_extractor.ontology import Ontology
 from awe_components.components.utility_functions \
     import print_parse_tree
-
-pipeline_def = [{'package': 'spacytextblob',
-                 'module': 'spacytextblob',
-                 'component': 'spacytextblob',
-                 'language': 'en'},
-                {'package': 'awe_components.components',
-                 'module': 'lexicalFeatures',
-                 'component': 'lexicalfeatures',
-                 'language': 'en'},
-                {'package': 'awe_components.components',
-                 'module': 'syntaxDiscourseFeats',
-                 'component': 'syntaxdiscoursefeatures',
-                 'language': 'en'},
-                {'package': 'awe_components.components',
-                 'module': 'viewpointFeatures',
-                 'component': 'viewpointfeatures',
-                 'language': 'en'},
-                {'package': 'awe_components.components',
-                 'module': 'lexicalClusters',
-                 'component': 'lexicalclusters',
-                 'language': 'en'},
-                {'package': 'awe_components.components',
-                 'module': 'contentSegmentation',
-                 'component': 'contentsegmentation',
-                 'language': 'en'}]
+from awe_workbench.pipeline import pipeline_def
 
 parser = holmes_extractor.manager.Manager(
             model='en_core_web_lg',

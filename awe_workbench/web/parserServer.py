@@ -78,29 +78,6 @@ class parserServer:
                                 self.parser.remove_document(labels[i])
                             self.parser.parse_and_register_document(text,labels[i])
                     await websocket.send(json.dumps(True))
-                elif messagelist[0] == 'PARSEONEWITHPROMPT':
-                    command = 'PARSEONEWITHPROMPT'
-                    label = messagelist[1]
-                    text = messagelist[2]
-                    prompt = messagelist[3]
-                    prompt_label = messagelist[4]
-                    if label in self.parser.list_document_labels():
-                        self.parser.remove_document(label)
-                    self.process_with_prompt(text, label, prompt, prompt_label)
-                    await websocket.send(json.dumps(True))
-                elif messagelist[0] == 'PARSESETWITHPROMPT':
-                    command = 'PARSESETWITHPROMPT'
-                    results = []
-                    [labels, texts] = messagelist[1]
-                    prompt = messagelist[2]
-                    prompt_label = messagelist[3]
-                    for i, text in enumerate(texts):
-                        text = texts[i]
-                        if text is not None and len(text)>0:
-                            if labels[i] in self.parser.list_document_labels():
-                                self.parser.remove_document(labels[i])
-                            doc = self.parser.process_with_prompt(text, label, prompt, prompt_label)
-                    await websocket.send(json.dumps(True))
                 elif messagelist[0] == 'LABELS':
                     command = 'LABELS'
                     labels = self.parser.list_document_labels()
@@ -996,6 +973,7 @@ class parserServer:
                     'min_devword_token_freq',\
                     'max_devword_token_freq',\
                     'stdev_devword_token_freq',\
+                    'mean_devword_concreteness',\
                     'median_devword_concreteness',\
                     'min_devword_concreteness',\
                     'max_devword_concreteness',\
@@ -1011,7 +989,7 @@ class parserServer:
                         doc._.med_nSyll,\
                         doc._.max_nSyll,\
                         doc._.min_nSyll,\
-                        doc._.std_nSyll,\
+                        doc._.std_nSyll, \
                         doc._.mean_sqnChars,\
                         doc._.med_sqnChars,\
                         doc._.max_sqnChars,\
@@ -1192,44 +1170,12 @@ class parserServer:
                     await websocket.send(json.dumps(summaryFeats))
                 else:
                     await websocket.send(json.dumps(False))
+                """
+                ,\
+                """
             except Exception as e:
                 print('exception', e, command)
                 await websocket.send(json.dumps(None))
-
-    def process_with_prompt(self, text, label, prompt, prompt_label):
-        self.parser.parse_and_register_document(text, label)
-        doc = self.get_document(label)
-        if prompt is not None:
-            pl = self.get_document(prompt_label)
-            if pl is None:
-                prompt = self.register_prompt(prompt_label, prompt)
-                doc._.prompt = prompt_label
-            doc = self.parser.get_document(label)
-            prompt = self.parser.get_document(prompt_label)
-            
-            core_sentences, extended_core_sentences, \
-                elaboration_sentences, pclusters, plemmas = extract_content_segments(prompt, doc)
-
-            doc._.core_sentences = core_sentences
-            doc._.extended_core_sentences = extended_core_sentences
-            doc._.content_segments = elaboration_sentences
-            doc._.prompt_related = pclusters
-            doc._.prompt_language = plemmas
-
-        else:
-            doc = self.get_document(label)
-            doc._.content_segments, doc._.prompt_related, doc._.prompt_language, doc._.core_sentences = extract_content_segments(None, doc)
-
-        self.remove_document(label)
-        self.register_serialized_document(doc.to_bytes(), label)
-        return doc
-
-    def register_prompt(self, label, prompt):
-        self.parser.parse_and_register_document(prompt, label)
-        doc = self.parser.get_document(label)
-        return doc
-
-
 
 
 if __name__ == '__main__':

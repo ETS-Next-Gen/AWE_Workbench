@@ -21,10 +21,10 @@ from awe_languagetool.languagetoolClient import languagetoolClient
 
 def startServers():
     queue = Queue()
-    p1 = Process(target=awe_workbench.languagetool.languagetoolServer.runServer, args=())
+    p1 = Process(target=awe_languagetool.languagetoolServer.runServer, args=())
     p1.start()
 
-    p2 = Process(target=awe_workbench.spellcorrect.spellcorrectServer.spellcorrectServer, args=())
+    p2 = Process(target=awe_spellcorrect.spellcorrectServer.spellcorrectServer, args=())
     p2.start()
 
     p3 = Process(target=awe_workbench.web.parserServer.parserServer, args=())
@@ -72,7 +72,7 @@ class ServerAPITest(unittest.TestCase):
         self.cs, self.parser, self.lt = initialize()
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(self):  
         self.p1.terminate()
         self.p2.terminate()
         self.p3.terminate()
@@ -1075,8 +1075,7 @@ class ServerAPITest(unittest.TestCase):
         self.assertEqual(ok,True)
 
     def testPromptLanguage(self):
-        prompt = "As people rely more and more on technology to solve problems, the ability of humans to think for themselves will surely deteriorate."
-        ok = self.parser.send(['PARSEONEWITHPROMPT',labels[0],texts[0],prompt,'effect of technology on thinking'])
+        ok = self.parser.send(['PARSEONE',labels[0],texts[0]])
         self.assertEqual(ok,True)
         promptlanguage = self.parser.send(['PROMPTLANGUAGE', labels[0]])
         #fp = open("pickles/promptlanguage.dat", "wb")
@@ -1090,8 +1089,7 @@ class ServerAPITest(unittest.TestCase):
         self.assertEqual(ok,True)
 
     def testContentSegments(self):
-        prompt = "As people rely more and more on technology to solve problems, the ability of humans to think for themselves will surely deteriorate."
-        ok = self.parser.send(['PARSEONEWITHPROMPT',labels[0],texts[0],prompt,'effect of technology on thinking'])
+        ok = self.parser.send(['PARSEONE',labels[0],texts[0]])
         self.assertEqual(ok,True)
         contentsegments = self.parser.send(['CONTENTSEGMENTS', labels[0]])
         #fp = open("pickles/contentsegments.dat", "wb")
@@ -1106,8 +1104,7 @@ class ServerAPITest(unittest.TestCase):
 
 
     def testPromptRelated(self):
-        prompt = "As people rely more and more on technology to solve problems, the ability of humans to think for themselves will surely deteriorate."
-        ok = self.parser.send(['PARSEONEWITHPROMPT',labels[0],texts[0],prompt,'effect of technology on thinking'])
+        ok = self.parser.send(['PARSEONE',labels[0],texts[0]])
         self.assertEqual(ok,True)
         locations = self.parser.send(['PROMPTRELATED', labels[0]])
         #fp = open("pickles/promptrelated.dat", "wb")
@@ -1121,8 +1118,7 @@ class ServerAPITest(unittest.TestCase):
         self.assertEqual(ok,True)
 
     def testCoreSentences(self):
-        prompt = "As people rely more and more on technology to solve problems, the ability of humans to think for themselves will surely deteriorate."
-        ok = self.parser.send(['PARSEONEWITHPROMPT',labels[0],texts[0],prompt,'effect of technology on thinking'])
+        ok = self.parser.send(['PARSEONE',labels[0],texts[0]])
         self.assertEqual(ok,True)
         locations = self.parser.send(['CORESENTENCES', labels[0]])
         #fp = open("pickles/coresentences.dat", "wb")
@@ -1136,8 +1132,7 @@ class ServerAPITest(unittest.TestCase):
         self.assertEqual(ok,True)
 
     def testClaimTexts(self):
-        prompt = "As people rely more and more on technology to solve problems, the ability of humans to think for themselves will surely deteriorate."
-        ok = self.parser.send(['PARSEONEWITHPROMPT',labels[0],texts[0],prompt,'effect of technology on thinking'])
+        ok = self.parser.send(['PARSEONE',labels[0],texts[0]])
         self.assertEqual(ok,True)
         locations = self.parser.send(['CLAIMTEXTS', labels[0]])
         #fp = open("pickles/claimtexts.dat", "wb")
@@ -1151,8 +1146,7 @@ class ServerAPITest(unittest.TestCase):
         self.assertEqual(ok,True)
 
     def testDiscussionTexts(self):
-        prompt = "As people rely more and more on technology to solve problems, the ability of humans to think for themselves will surely deteriorate."
-        ok = self.parser.send(['PARSEONEWITHPROMPT',labels[0],texts[0],prompt,'effect of technology on thinking'])
+        ok = self.parser.send(['PARSEONE',labels[0],texts[0]])
         self.assertEqual(ok,True)
         locations = self.parser.send(['DISCUSSIONTEXTS', labels[0]])
         #fp = open("pickles/discussiontexts.dat", "wb")
