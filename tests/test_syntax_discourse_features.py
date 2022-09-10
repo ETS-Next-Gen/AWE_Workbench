@@ -236,19 +236,19 @@ class SyntaxDiscourseFeatureTest(unittest.TestCase):
 
     def test_words_to_sentence_root(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.words_before_sentence_root,[8, 3, 7, 2, 5, 22, 8, 7, 3, 2, 8, 2, 10, 3, 7, 4, 4, 8, 10, 5, 5, 10, 0, 10, 2, 7, 14, 8, 4, 12, 12, 0, 3, 6, 4, 10, 1])
+        self.assertEqual(doc._.words_before_sentence_root,[8, 3, 7, 2, 5, 8, 7, 3, 2, 8, 2, 10, 3, 7, 4, 4, 8, 10, 5, 5, 10, 0, 10, 2, 7, 14, 8, 4, 12, 0, 3, 6, 4, 10, 1])
 
     def test_mean_words_to_sentence_root(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.mean_words_to_sentence_root, 6.378378378378378)        
+        self.assertEqual(doc._.mean_words_to_sentence_root, 5.771428571428571)        
 
     def test_median_words_to_sentence_root(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.median_words_to_sentence_root,6)        
+        self.assertEqual(doc._.median_words_to_sentence_root,5)        
 
     def test_max_words_to_sentence_root(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.max_words_to_sentence_root,22)
+        self.assertEqual(doc._.max_words_to_sentence_root,14)
 
     def test_min_words_to_sentence_root(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
@@ -256,56 +256,55 @@ class SyntaxDiscourseFeatureTest(unittest.TestCase):
 
     def test_stdev_words_to_sentence_root(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.stdev_words_to_sentence_root,4.430646750828894)
-
-    def test_syntacticRhemeDepths(self):
-        doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.syntacticRhemeDepths,[2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 0.0, 2.0, 3.0, 3.0, 2.0, 3.0, 3.0, 2.0, 3.0, 5.0, 4.0, 2.0, 2.0, 2.0, 2.0, 2.0, 0.0, 2.0, 3.0, 3.0, 3.0, 2.0, 2.0]
-)
-
-    def test_meanRhemeDepth(self):
-        doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.meanRhemeDepth, 2.28125)        
-
-    def test_medianRhemeDepth(self):
-        doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.medianRhemeDepth,2.0)        
-
-    def test_maxRhemeDepth(self):
-        doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.maxRhemeDepth,5.0)
-
-    def test_minRhemeDepth(self):
-        doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.minRhemeDepth,0.0)
-
-    def test_stdevRhemeDepth(self):
-        doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.stdevRhemeDepth,0.9240295694193397)
+        self.assertEqual(doc._.stdev_words_to_sentence_root,3.507015777533022)
 
     def test_syntacticThemeDepths(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.syntacticThemeDepths,[1.0, 2.0, 4.0, 4.0, 3.0, 2.0, 4.0, 4.0, 3.0, 2.0, 1.0, 3.0, 2.0, 3.0, 4.0, 4.0, 5.0, 5.0, 4.0, 5.0, 6.0, 4.0, 3.0, 5.0, 4.0, 2.0, 1.0, 3.0, 3.0, 3.0, 2.0, 4.0, 3.0, 2.0, 1.0, 2.0, 3.0, 4.0, 6.0, 5.0, 7.0, 6.0, 7.0, 9.0, 9.0, 9.0, 8.0, 2.0, 1.0, 2.0, 3.0, 4.0, 3.0, 3.0, 2.0, 3.0, 5.0, 4.0, 6.0, 5.0, 6.0, 7.0, 9.0, 8.0, 10.0, 9.0, 12.0, 11.0, 10.0, 2.0, 1.0, 2.0, 4.0, 3.0, 5.0, 4.0, 5.0, 6.0, 8.0, 7.0, 2.0, 1.0, 2.0, 2.0, 4.0, 3.0, 4.0, 6.0, 6.0, 5.0, 2.0, 1.0, 3.0, 2.0, 4.0, 4.0, 3.0, 3.0, 5.0, 4.0, 5.0, 7.0, 6.0, 8.0, 8.0, 8.0, 7.0, 8.0, 9.0, 2.0, 1.0, 3.0, 4.0, 4.0, 3.0, 4.0, 5.0, 2.0, 4.0, 3.0, 5.0, 5.0, 5.0, 4.0, 5.0, 6.0, 5.0, 7.0, 6.0, 2.0, 1.0, 3.0, 3.0, 5.0, 4.0, 5.0, 4.0, 5.0, 5.0, 5.0, 4.0, 3.0, 4.0, 4.0, 3.0, 3.0, 2.0, 4.0, 3.0, 5.0, 4.0, 5.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 2.0, 1.0, 3.0, 2.0, 2.0, 3.0, 6.0, 5.0, 4.0, 2.0, 1.0, 3.0, 2.0, 4.0, 3.0, 5.0, 5.0, 4.0, 2.0, 1.0, 3.0, 3.0, 2.0, 3.0, 4.0, 2.0, 1.0, 3.0, 2.0, 3.0, 3.0, 3.0, 2.0, 4.0, 3.0, 2.0, 1.0, 3.0, 2.0, 4.0, 4.0, 4.0, 3.0, 4.0, 5.0, 2.0, 1.0, 2.0, 3.0, 3.0, 4.0, 2.0, 4.0, 3.0, 2.0, 2.0, 2.0, 2.0, 1.0, 3.0, 2.0, 4.0, 4.0, 4.0, 3.0, 4.0, 5.0, 2.0, 1.0, 3.0, 2.0, 3.0, 5.0, 4.0, 5.0, 7.0, 7.0, 6.0, 2.0, 1.0, 3.0, 2.0, 3.0, 4.0, 6.0, 6.0, 7.0, 7.0, 7.0, 6.0, 5.0, 2.0, 1.0, 3.0, 3.0, 2.0, 4.0, 3.0, 4.0, 4.0, 5.0, 6.0, 2.0, 2.0, 5.0, 4.0, 4.0, 3.0, 5.0, 4.0, 6.0, 5.0, 6.0, 2.0, 1.0, 3.0, 3.0, 2.0, 3.0, 5.0, 4.0, 5.0, 4.0, 2.0, 1.0, 3.0, 3.0, 2.0, 4.0, 4.0, 3.0, 2.0, 1.0, 3.0, 4.0, 4.0, 3.0, 4.0, 4.0, 3.0, 4.0, 6.0, 5.0, 3.0, 2.0, 3.0, 5.0, 5.0, 4.0, 5.0, 6.0, 2.0, 1.0, 2.0, 2.0, 4.0, 4.0, 3.0, 2.0, 4.0, 5.0, 4.0, 4.0, 3.0, 2.0, 1.0, 2.0, 3.0, 4.0, 4.0, 4.0, 4.0, 3.0, 4.0, 4.0, 6.0, 6.0, 5.0, 2.0, 1.0, 2.0, 4.0, 5.0, 4.0, 3.0, 2.0, 1.0, 3.0, 2.0, 3.0, 7.0, 6.0, 5.0, 4.0, 2.0, 1.0, 3.0, 3.0, 3.0, 2.0, 3.0, 5.0, 4.0, 2.0, 4.0, 3.0, 2.0, 1.0, 3.0, 3.0, 2.0, 3.0, 5.0, 5.0, 5.0, 4.0, 5.0, 5.0, 7.0, 6.0, 7.0, 8.0, 2.0, 1.0, 2.0, 1.0, 3.0, 4.0, 4.0, 4.0, 3.0, 2.0, 4.0, 4.0, 3.0, 4.0, 5.0, 2.0, 1.0, 3.0, 3.0, 2.0, 2.0, 4.0, 3.0, 2.0, 2.0, 3.0, 2.0, 4.0, 3.0, 4.0, 5.0, 2.0, 4.0, 3.0, 2.0, 1.0, 3.0, 2.0, 5.0, 4.0, 3.0, 4.0, 5.0, 2.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 1.0, 2.0, 1.0, 2.0, 1.0, 3.0, 3.0, 2.0, 2.0, 2.0, 4.0, 3.0, 4.0, 5.0, 4.0, 6.0, 5.0, 6.0, 7.0, 2.0, 1.0, 3.0, 2.0, 3.0, 5.0, 4.0, 5.0, 6.0, 5.0, 6.0, 5.0, 6.0, 5.0, 2.0, 3.0, 3.0, 3.0, 2.0, 2.0, 1.0, 3.0, 2.0, 4.0, 3.0, 4.0, 6.0, 6.0, 5.0, 4.0, 6.0, 5.0, 2.0, 2.0, 3.0, 1.0, 3.0, 3.0, 2.0, 2.0, 4.0, 3.0, 5.0, 5.0, 4.0, 5.0, 7.0, 6.0, 7.0, 9.0, 8.0, 2.0])
+        self.assertEqual(doc._.syntacticThemeDepths,[2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 3, 3, 2, 3, 3, 2, 3, 5, 4, 2, 2, 2, 2, 2, 0, 2, 3, 3, 3, 2, 2])
 
     def test_meanThemeDepth(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.meanThemeDepth, 3.733067729083665)        
+        self.assertEqual(doc._.meanThemeDepth, 2.28125)        
 
     def test_medianThemeDepth(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.medianThemeDepth,3.0)        
+        self.assertEqual(doc._.medianThemeDepth,2.0)        
 
     def test_maxThemeDepth(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.maxThemeDepth,12.0)
+        self.assertEqual(doc._.maxThemeDepth,5.0)
 
     def test_minThemeDepth(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.minThemeDepth,1.0)
+        self.assertEqual(doc._.minThemeDepth,0.0)
 
     def test_stdevThemeDepth(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
-        self.assertEqual(doc._.stdevThemeDepth,1.8765445139321595)
+        self.assertEqual(doc._.stdevThemeDepth,0.9240295694193397)
+
+    def test_syntacticRhemeDepths(self):
+        doc = holmes_manager.get_document('GRE_Sample_Essay')
+        self.assertEqual(doc._.syntacticRhemeDepths,[1.0, 2.0, 4.0, 4.0, 3.0, 2.0, 4.0, 4.0, 3.0, 2.0, 1.0, 3.0, 2.0, 3.0, 4.0, 4.0, 5.0, 5.0, 4.0, 5.0, 6.0, 4.0, 3.0, 5.0, 4.0, 2.0, 1.0, 3.0, 3.0, 3.0, 2.0, 4.0, 3.0, 2.0, 1.0, 2.0, 3.0, 4.0, 6.0, 5.0, 7.0, 6.0, 7.0, 9.0, 9.0, 9.0, 8.0, 2.0, 1.0, 2.0, 3.0, 4.0, 3.0, 3.0, 2.0, 3.0, 5.0, 4.0, 6.0, 5.0, 6.0, 7.0, 9.0, 8.0, 10.0, 9.0, 12.0, 11.0, 10.0, 2.0, 1.0, 2.0, 4.0, 3.0, 5.0, 4.0, 5.0, 6.0, 8.0, 7.0, 2.0, 1.0, 2.0, 2.0, 4.0, 3.0, 4.0, 6.0, 6.0, 5.0, 2.0, 1.0, 3.0, 2.0, 4.0, 4.0, 3.0, 3.0, 5.0, 4.0, 5.0, 7.0, 6.0, 8.0, 8.0, 8.0, 7.0, 8.0, 9.0, 2.0, 1.0, 3.0, 4.0, 4.0, 3.0, 4.0, 5.0, 2.0, 4.0, 3.0, 5.0, 5.0, 5.0, 4.0, 5.0, 6.0, 5.0, 7.0, 6.0, 2.0, 1.0, 3.0, 3.0, 5.0, 4.0, 5.0, 4.0, 5.0, 5.0, 5.0, 4.0, 3.0, 4.0, 4.0, 3.0, 3.0, 2.0, 4.0, 3.0, 5.0, 4.0, 5.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 2.0, 1.0, 3.0, 2.0, 2.0, 3.0, 6.0, 5.0, 4.0, 2.0, 1.0, 3.0, 2.0, 4.0, 3.0, 5.0, 5.0, 4.0, 2.0, 1.0, 3.0, 3.0, 2.0, 3.0, 4.0, 2.0, 1.0, 3.0, 2.0, 3.0, 3.0, 3.0, 2.0, 4.0, 3.0, 2.0, 1.0, 3.0, 2.0, 4.0, 4.0, 4.0, 3.0, 4.0, 5.0, 2.0, 1.0, 2.0, 3.0, 3.0, 4.0, 2.0, 4.0, 3.0, 2.0, 2.0, 2.0, 2.0, 1.0, 3.0, 2.0, 4.0, 4.0, 4.0, 3.0, 4.0, 5.0, 2.0, 1.0, 3.0, 2.0, 3.0, 5.0, 4.0, 5.0, 7.0, 7.0, 6.0, 2.0, 1.0, 3.0, 2.0, 3.0, 4.0, 6.0, 6.0, 7.0, 7.0, 7.0, 6.0, 5.0, 2.0, 1.0, 3.0, 3.0, 2.0, 4.0, 3.0, 4.0, 4.0, 5.0, 6.0, 2.0, 2.0, 5.0, 4.0, 4.0, 3.0, 5.0, 4.0, 6.0, 5.0, 6.0, 2.0, 1.0, 3.0, 3.0, 2.0, 3.0, 5.0, 4.0, 5.0, 4.0, 2.0, 1.0, 3.0, 3.0, 2.0, 4.0, 4.0, 3.0, 2.0, 1.0, 3.0, 4.0, 4.0, 3.0, 4.0, 4.0, 3.0, 4.0, 6.0, 5.0, 3.0, 2.0, 3.0, 5.0, 5.0, 4.0, 5.0, 6.0, 2.0, 1.0, 2.0, 2.0, 4.0, 4.0, 3.0, 2.0, 4.0, 5.0, 4.0, 4.0, 3.0, 2.0, 1.0, 2.0, 3.0, 4.0, 4.0, 4.0, 4.0, 3.0, 4.0, 4.0, 6.0, 6.0, 5.0, 2.0, 1.0, 2.0, 4.0, 5.0, 4.0, 3.0, 2.0, 1.0, 3.0, 2.0, 3.0, 7.0, 6.0, 5.0, 4.0, 2.0, 1.0, 3.0, 3.0, 3.0, 2.0, 3.0, 5.0, 4.0, 2.0, 4.0, 3.0, 2.0, 1.0, 3.0, 3.0, 2.0, 3.0, 5.0, 5.0, 5.0, 4.0, 5.0, 5.0, 7.0, 6.0, 7.0, 8.0, 2.0, 1.0, 2.0, 1.0, 3.0, 4.0, 4.0, 4.0, 3.0, 2.0, 4.0, 4.0, 3.0, 4.0, 5.0, 2.0, 1.0, 3.0, 3.0, 2.0, 2.0, 4.0, 3.0, 2.0, 2.0, 3.0, 2.0, 4.0, 3.0, 4.0, 5.0, 2.0, 4.0, 3.0, 2.0, 1.0, 3.0, 2.0, 5.0, 4.0, 3.0, 4.0, 5.0, 2.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 1.0, 2.0, 1.0, 2.0, 1.0, 3.0, 3.0, 2.0, 2.0, 2.0, 4.0, 3.0, 4.0, 5.0, 4.0, 6.0, 5.0, 6.0, 7.0, 2.0, 1.0, 3.0, 2.0, 3.0, 5.0, 4.0, 5.0, 6.0, 5.0, 6.0, 5.0, 6.0, 5.0, 2.0, 3.0, 3.0, 3.0, 2.0, 2.0, 1.0, 3.0, 2.0, 4.0, 3.0, 4.0, 6.0, 6.0, 5.0, 4.0, 6.0, 5.0, 2.0, 2.0, 3.0, 1.0, 3.0, 3.0, 2.0, 2.0, 4.0, 3.0, 5.0, 5.0, 4.0, 5.0, 7.0, 6.0, 7.0, 9.0, 8.0, 2.0])
+
+    def test_meanRhemeDepth(self):
+        doc = holmes_manager.get_document('GRE_Sample_Essay')
+        self.assertEqual(doc._.meanRhemeDepth, 3.733067729083665)        
+
+    def test_medianRhemeDepth(self):
+        doc = holmes_manager.get_document('GRE_Sample_Essay')
+        self.assertEqual(doc._.medianRhemeDepth,3.0)        
+
+    def test_maxRhemeDepth(self):
+        doc = holmes_manager.get_document('GRE_Sample_Essay')
+        self.assertEqual(doc._.maxRhemeDepth,12.0)
+
+    def test_minRhemeDepth(self):
+        doc = holmes_manager.get_document('GRE_Sample_Essay')
+        self.assertEqual(doc._.minRhemeDepth,1.0)
+
+    def test_stdevThemeDepth(self):
+        doc = holmes_manager.get_document('GRE_Sample_Essay')
+        self.assertEqual(doc._.stdevRhemeDepth,1.8765445139321595)
 
     def test_weightedSyntacticDepths(self):
         doc = holmes_manager.get_document('GRE_Sample_Essay')
@@ -382,8 +381,4 @@ class SyntaxDiscourseFeatureTest(unittest.TestCase):
         self.assertEqual(doc._.propn_past,0.3252840909090909)
 
     doc = holmes_manager.get_document('GRE_Sample_Essay')
-    print(doc._.pastTenseScope)
-    print(doc._.propn_past)
-    print(doc._.transition_word_type_count)
-    print(doc._.total_transition_words)
 
