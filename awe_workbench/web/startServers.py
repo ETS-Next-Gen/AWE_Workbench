@@ -12,6 +12,7 @@ import awe_workbench.web.parserServer
 import argparse
 from awe_workbench.pipeline import pipeline_def
 
+
 class startServers:
 
     # Initialize
@@ -23,25 +24,27 @@ class startServers:
     def __init__(self):
         queue = Queue()
 
-   
-        p1 = Process(target=awe_languagetool.languagetoolServer.runServer, args=())
+        p1 = \
+            Process(target=awe_languagetool.languagetoolServer.runServer,
+                    args=())
         p1.start()
 
-        p2 = Process(target=awe_spellcorrect.spellcorrectServer.spellcorrectServer, args=())
+        p2 = \
+            Process(target=awe_spellcorrect.spellcorrectServer.spellcorrectServer,
+                    args=())
         p2.start()
 
         p3 = Process(target=awe_workbench.web.parserServer.parserServer,
                      args=(),
-                     kwargs={'pipeline_def':pipeline_def})
+                     kwargs={'pipeline_def': pipeline_def})
         p3.start()
+
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Run AWE Workbench server scripts')
+    parser = \
+       argparse.ArgumentParser(description='Run AWE Workbench server scripts')
 
     args = parser.parse_args()
 
     startServers()
-    
-
-

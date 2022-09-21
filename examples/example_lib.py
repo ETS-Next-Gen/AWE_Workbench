@@ -124,40 +124,167 @@ def doctokens_to_text(doctokens):
     return "".join(text), start_positions, stop_positions
 
 
+def getOriginalOffsets(text, doctokens):
+    ''' Making some simple assumptions about how the text
+        changed as a result of spell-correction, we recover
+        the original offsets. Note: this is a hack. TBD:
+        correct way to get the offsets to the original student
+        text.
+    '''
+    tokenoffsets = []
+    loc = 0
+    edit_count = 0
+    for token in doctokens:
+        record = {}
+        record['token'] = token
+        if token == ' ':
+            edit_count = 0
+            record['start'] = loc
+            while loc<len(text) and text[loc] in [' ', '\t']:
+                loc += 1
+            record['end'] = loc
+            tokenoffsets.append(record)
+            continue
+        if '\n' in token:
+            edit_count = 0
+            record['start'] = loc
+            while loc<len(text) and text[loc] in [' ', '\t', '\n']:
+                loc += 1
+            record['end'] = loc
+            tokenoffsets.append(record)
+            continue            
+        while text[loc] in [' ', '\t']:
+            loc += 1
+        if text[loc:].startswith(token):
+            edit_count = 0
+            record['start'] = loc
+            loc += len(token)
+            record['end'] = loc
+            tokenoffsets.append(record)
+        else:
+            edit_count +=1
+            record['start'] = loc
+            loc += len(token)
+            record['end'] = loc
+            tokenoffsets.append(record)
+            while loc<len(text) and re.match('[A-Za-z0-9\.\']', text[loc]):
+                loc += 1
+    if edit_count>1:
+        return False, []
+    else:
+        return True, tokenoffsets
+
+def values2offsets(token_nums, text, token2text):
+     matches = []
+     for i, item in enumerate(token_nums):
+         if item is not None:
+             record = token2text[i]
+             newrecord = {}
+             newrecord['offset'] = record['start']
+             newrecord['length'] = record['end']-record['start']
+             newrecord['value'] = item
+             matches.append(newrecord)
+     return matches
+
+def flags2offsets(token_nums, text, token2text):
+     matches = []
+     for i, item in enumerate(token_nums):
+         if item:
+             record = token2text[i]
+             newrecord = {}
+             newrecord['offset'] = record['start']
+             newrecord['length'] = record['end']-record['start']
+             matches.append(newrecord)
+     return matches
+
+def flags2list(token_nums, text, token2text):
+     matches = []
+     for i, item in enumerate(token_nums):
+         if item:
+             record = token2text[i]
+             word = text[record['start']:record['end']]
+             matches.append(word)
+     return matches
+
+def index2offsets(token_nums, text, token2text):
+     matches = []
+     for i in token_nums:
+         record = token2text[i]
+         newrecord = {}
+         newrecord['offset'] = record['start']
+         newrecord['length'] = record['end']-record['start']
+         matches.append(newrecord)
+     return matches
+
+def index2list(token_nums, text, token2text):
+     matches = []
+     for i in token_nums:
+         record = token2text[i]
+         word = text[record['start']:record['end']]
+         matches.append(word)
+     return matches
+
 FEATURE_LIST = {
-    "ACADEMICS": {"description": "Academic Words"},
+    "ACADEMICS": {"description": "Academic Words", 'type': 'flag_map'},
     "ARGUMENTWORDS": {
         "description": "Explicit Argumentation Words",
-        "notes": "We will get some explicit argumentation words showing up,"
-        + "since the code is based on a wordlist, but there won't"
-        + " be a lot"
+        "notes": "In a narrative, we will get some explicit"
+        + " argumentation words showing up, since the code is"
+        + " based on a wordlist, but there won't"
+        + " be a lot", "type": "index_map"
     },
-    "ATTRIBUTIONS": {"description": "Attribution", "type": "binary_map"},
-    "CHARACTERWORDS": {"description": "Character Words", "type": "binary_map"},
-    "CITES": {"description": "Citations"},
-    "CONCRETEDETAILS": {"description": "Concrete Details"},
-    "CONTENTSEGMENTS": {"description": "Content Segments"},
-    "CORESENTENCES": {"description": "Core Sentences"},
+    "ATTRIBUTIONS": {"description": "Attribution",
+                     "type": "flag_map"},
+    "CHARACTERWORDS": {"description": "Character Trait Words",
+                       "type": "flag_map"},
+    "CITES": {"description": "Citations",
+              "type": "flag_map"},
+    "CONCRETEDETAILS": {"description": "Concrete Details",
+                        "type": "index_map"},
+    "CONTENTSEGMENTS": {"description": "Content Segments",
+                        "type": "range_map"},
+    "CORESENTENCES": {"description": "Argument main idea sentences",
+                      "type": "range_map"},
     "DIRECTSPEECHSPANS": {"description": "Direct Speech Spans"},
-    "DOCTOKENS": {"description": "Tokens (mostly individual words)"},
-    "EMOTIONWORDS": {"description": "Emotion Words", "type": "binary_map"},
-    "EXTENDEDCORESENTENCES": {"description": "Extended Core Sentences"},
-    "FREQUENCIES": {"description": "Frequencies"},
-    "HALROOTFREQS": {"description": "Dunno"},
-    "LATINATES": {"description": "Latinates"},
-    "LOCATIONS": {"description": "Locations", "type": "binary_map"},
+    "DOCTOKENS": {"description": "Tokens (mostly individual words)",
+                  "type": "segmentation"},
+    "EMOTIONWORDS": {"description": "Emotion Words",
+                     "type": "flag_map"},
+    "EXTENDEDCORESENTENCES": {"description": "Argument Style Supporting Ideas",
+                              "type": "range_map"},
+    "FREQUENCIES": {"description": "Word Frequencies in the Document",
+                    "type": "value_map"},
+    "HALROOTFREQS": {"description": "Root Frequencies based on the HAL Corpus",
+                     "type": "value_map"},
+    "LATINATES": {"description": "Latinate vocabulary",
+                  "type": "flag_map"},
+    "LOCATIONS": {"description": "Locations",
+                  "type": "flag_map"},
     "NOMINALREFERENCES": {"description": "Nominal References"},
-    "PARAGRAPHS": {"description": "Paragraphs"},
+    "PARAGRAPHS": {"description": "Paragraph token spans",
+                   "type": "segmentation"},
     "PERSPECTIVES": {"description": "Perspectives"},
-    "POS": {"description": "Part-of-speech tags"},
-    "PROMPTLANGUAGE": {"description": "Language from the Prompt"},
-    "PROMPTRELATED": {"description": "Language Related to the Prompt"},
-    "QUOTEDTEXT": {"description": "Quotes"},
-    "SENTENCES": {"description": "Sentences"},
-    "SOCIAL_AWARENESS": {"description": "Social"},
-    "SOURCES": {"description": "Sources", "type": "binary_map"},
+    "POS": {"description": "Part-of-speech tags",
+            "type": "value_map"},
+    "PROMPTLANGUAGE": {"description": "Language likely to be from the Prompt,"
+                       + " reflecting the top three topic clusters identified"
+                       + " in the text",
+                       "type": "wordlist"},
+    "PROMPTRELATED": {"description": "Cluster information for language likely "
+                      + "to be related to the prompt specifying the top three"
+                      + "topic clusters identified in the text",
+                      "type": "clusterinfo"},
+    "QUOTEDTEXT": {"description": "Quotes",
+                   "type": "flag_map"},
+    "SENTENCES": {"description": "Sentence token spans",
+                  "type": "segmentation"},
+    "SOCIAL_AWARENESS": {"description": "Social",
+                         "type": "range_map"},
+    "SOURCES": {"description": "Sources",
+                "type": "flag_map"},
     "TENSECHANGES": {"description": "Tense Changes"},
-    "TRANSITIONPROFILE": {"description": "Transition Profile"},
+    "TRANSITIONPROFILE": {"description": "Transition Profile",
+                          "type": "transitions"},
 }
 
 
@@ -276,7 +403,7 @@ def highlight_text(text, highlights, formatter):
 
         lastoffset = item['offset'] + item['length']
         lastlength = item['length']
-    output_text.append(text[lastoffset+lastlength:])
+    output_text.append(text[lastoffset:])
     output_text.append(render_footer())
 
     return "".join(output_text)
@@ -289,6 +416,19 @@ def highlight_tokens(tokens, highlights, formatter):
     deal with text and sometimes with tokens.
     '''
     pass
+
+
+def render_highlight_item(text, item):
+    if HTML_MODE:
+        format_string = '"<span class="highlight" >"{text}</span>"'
+    else:
+        format_string = colorama.Fore.YELLOW + \
+                        "{text}" \
+                        + colorama.Fore.RESET
+    return format_string.format(
+        text=text,
+        **item
+    )
 
 
 def render_correction_item(text, item):
@@ -413,6 +553,17 @@ def render_index_list(features, topic):
     h1(FEATURE_LIST[topic.upper()]['description'])
     dt("Occurances", len(features[topic]))
     dt("Words", ul(index_to_words(features['doctokens'], features[topic])))
+
+def render_flag_list(features, topic):
+    '''
+    Show all of the words flagged in a flag list, as well as their count
+    '''
+
+    featureIdx = binary_map_to_indexes(features[topic])
+
+    h1(FEATURE_LIST[topic.upper()]['description'])
+    dt("Occurances", len(featureIdx))
+    dt("Words", ul(index_to_words(features['doctokens'], featureIdx)))
 
 
 def binary_map_to_indexes(binary_map):

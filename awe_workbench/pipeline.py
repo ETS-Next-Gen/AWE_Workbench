@@ -5,11 +5,13 @@
 
 # from spacytextblob.spacytextblob import SpacyTextBlob
 # https://github.com/SamEdwardes/spaCyTextBlob
-# wrapper for TextBlob, https://github.com/sloria/TextBlob, which offers other NLP services.
-# but the sentiment features contribute something that Spacy does not come with out of the box.
-# SpacyTextBlob sentiment analysis gives subjectivity dimension, not just positive/negative polarity
-# To get this to work with holmes, we need to use forked version of holmes extractor that
-# supports insertion of spacy components into it spacy pipeline.
+# wrapper for TextBlob, https://github.com/sloria/TextBlob, which
+# offers other NLP services. But the sentiment features contribute
+# something that Spacy does not come with out of the box.
+# SpacyTextBlob sentiment analysis gives subjectivity dimension,
+# not just positive/negative polarity. To get this to work with holmes,
+# we need to use forked version of holmes extractor that supports
+# insertion of spacy components into it spacy pipeline.
 #
 # lexicalFeatures
 # Module that adds features reflecting lexical properties to tokens, including
@@ -62,4 +64,3 @@ pipeline_def = [{'package': 'spacytextblob',
                  'module': 'contentSegmentation',
                  'component': 'contentsegmentation',
                  'language': ['en']}]
-

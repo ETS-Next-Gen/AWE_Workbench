@@ -14,6 +14,7 @@ from awe_workbench.web.websocketClient import websocketClient
 from awe_languagetool.languagetoolClient import languagetoolClient
 import nltk
 from nltk.corpus import stopwords
+import argparse
 
 nltk.download('stopwords')
 stopWords = set(stopwords.words('english'))
@@ -76,6 +77,16 @@ def normalize(text):
 if __name__ == '__main__':
 
     cs, parser, lt = initialize()
+
+    argparser = argparse.ArgumentParser(description="Parse a student text file")
+    argparser.add_argument(
+        '--filename',
+        default="essays/gre6.txt",
+        help='Which file to parse'
+    )
+
+    args = argparser.parse_args()
+    doc = open(args.filename).read()
 
     text = None
     with open('essays/gre6.txt') as f:

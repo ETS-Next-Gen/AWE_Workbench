@@ -476,6 +476,22 @@ def prepareClaimDiscussionTextDisplay(tokens,
             temp2.append(' ' + token)
     return normalize(''.join(temp1)), normalize(''.join(temp2))
 
+def prepareRangeMarking(tokens, ranges):
+    loc = 0
+    output = ''
+    for item in ranges:
+        start = item[0]
+        if '\n' in tokens[start]:
+            start += 1
+        end = item[1]
+        output += ' '.join(tokens[loc:start])
+        output += ' <span style="background-color: yellow"> '
+        output += ' '.join(tokens[start:end])
+        output += ' </span> '
+        loc = end
+    output += ' '.join(tokens[loc:len(tokens)])
+    return normalize(output.replace('  ', ' '))
+
 
 def normalize(text):
     text = text.replace('&nbsp;', ' ')
@@ -538,6 +554,8 @@ option2 = st.selectbox('',
                         'Details',
                         'Transitions',
                         'Argument Words',
+                        'Statements of Fact',
+                        'Statements of Opinion',
                         'Own vs. Other Perspectives'))
 option3 = ''
 if option2 == 'Own vs. Other Perspectives':
@@ -620,8 +638,6 @@ ps = parser.send(['PERSPECTIVESPANS', document_label])
 sm = parser.send(['STANCEMARKERS', document_label])
 pa = parser.send(['PROPOSITIONALATTITUDES', document_label])
 
-print(pl, pr)
-
 prepcs = []
 cw = []
 prepcs = None
@@ -652,6 +668,12 @@ essaystructure, argumentwords = \
 transitions = prepareTransitionMarking(tokens, tp, prepcs)
 subjectivities, perspectives, stancemarkers = \
     prepareSubjectivityDisplay(tokens, ps, sm, option2, option3)
+
+sf = parser.send(['STATEMENTSOFFACT', document_label])
+factualStatements = prepareRangeMarking(tokens, sf)
+of = parser.send(['STATEMENTSOFOPINION', document_label])
+opinionStatements = prepareRangeMarking(tokens, of)
+
 ok = parser.send(['CLEARPARSED'])
 if option2 == 'Key Points':
     st.write(essaystructure, unsafe_allow_html=True)
@@ -659,11 +681,13 @@ elif option2 == 'Supporting Points':
     st.write(outhtml, unsafe_allow_html=True)
 elif option2 == 'Details':
     st.write(details, unsafe_allow_html=True)
-elif option2 == 'Content Words':
-    st.write(contentDev, unsafe_allow_html=True)
 elif option2 == 'Transitions':
     st.write(transitions, unsafe_allow_html=True)
 elif option2 == 'Argument Words':
     st.write(argumentwords, unsafe_allow_html=True)
+elif option2 == 'Statements of Fact':
+    st.write(factualStatements, unsafe_allow_html=True)
+elif option2 == 'Statements of Opinion':
+    st.write(opinionStatements, unsafe_allow_html=True)
 elif option2 == 'Own vs. Other Perspectives':
     st.write(subjectivities, unsafe_allow_html=True)

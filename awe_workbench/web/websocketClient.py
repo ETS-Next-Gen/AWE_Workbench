@@ -5,6 +5,8 @@ import asyncio
 import websocket
 import json
 from websocket import create_connection
+
+
 class websocketClient:
 
     uri = None
@@ -16,14 +18,13 @@ class websocketClient:
         self.uri = uri
 
     def send(self, texts: list):
-        #print(texts)
         if texts is None:
             print('no texts!')
             return None
         try:
             ws = create_connection(self.uri)
             ws.send(json.dumps(texts))
-            result =  ws.recv()
+            result = ws.recv()
             ws.close()
             return json.loads(result)
         except Exception as e:
@@ -36,14 +37,15 @@ class websocketClient:
         try:
             ws = create_connection(self.uri)
             ws.send(json.dumps(texts))
-            result =  ws.recv()
+            result = ws.recv()
             ws.close()
             return result
         except Exception as e:
             print(e)
             return None
 
+
 if __name__ == '__main__':
-     wsc = websocketClient()
-     test = wsc.check(['The grrls are happpy.'])
-     print(test)
+    wsc = websocketClient()
+    test = wsc.check(['The grrls are happpy.'])
+    print(test)
