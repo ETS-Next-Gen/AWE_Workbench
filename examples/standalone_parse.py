@@ -31,4 +31,5 @@ manager = holmes_extractor.manager.Manager(
 manager.parse_and_register_document(doc, 'temp')
 out = manager.get_document('temp')
 print_parse_tree(out)
-print(out._.vwp_statements_of_fact)
+print(out._.AWE_Info(infoType='Token', indicator='vwp_attribution', summaryType='counts', filters=[('vwp_attribution', ['True'])]))
+
