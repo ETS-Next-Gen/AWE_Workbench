@@ -966,6 +966,7 @@ def prepareArgumentWordMarking(tokens,
     inPromptSentences = []
     for i, item in enumerate(tokens):
         if core is not None and coreloc < len(core):
+            print(coreloc, core)
             start = core[coreloc][0]
             end = core[coreloc][1]
             if i >= start and i <= end:
@@ -1801,8 +1802,9 @@ print(percentTwoPlusSyls, ' percent words with two or more syllables')
 stypeList = parser.send(['AWE_INFO',
                         document_label,
                         'sentence_types', 'Doc'])
+print(stypeList)
 stypes = [entry['value'] for entry in stypeList.values()]
-
+print(stypes)
 ccdPage = \
     prepareCompoundComplexDisplay(stypes,
                                   posinfo,
@@ -1817,9 +1819,10 @@ ccdPage = \
                                   False)
 
 if option2 == 'Sentence Variety':
-    stypeList = parser.send(['SENTENCETYPES',
-                             document_label])
-    stypes = [entry['value'] for entry in stypeList]
+    stypeList = parser.send(['AWE_INFO',
+                            document_label,
+                            'sentence_types', 'Doc'])
+    stypes = [entry['value'] for entry in stypeList.values()]
 
     ccdPage = \
         prepareCompoundComplexDisplay(stypes,
@@ -2024,6 +2027,7 @@ argew = parser.send(["AWE_INFO",
 if argew is None:
     raise Exception("No information on explicit argument words retrieved")
 eaw = [entry['tokenIdx'] for entry in argew.values() if entry['value']]
+
 print('explicit argument words', [(entry['text'], entry['tokenIdx']) for entry in argew.values() if entry['value']])
 
 argw = parser.send(["AWE_INFO",
@@ -2032,13 +2036,11 @@ argw = parser.send(["AWE_INFO",
 
 print('argument words', [entry['text'] for entry in argw.values() if entry['value']])
 
-#awList = json.loads(parser.send(['ARGUMENTLANGUAGE', document_label]))
 awList = parser.send(["AWE_INFO",
                      document_label,
                      "vwp_argumentation"])
 if awList is None:
     raise Exception("No information on argument words retrieved")
-
 aw = [entry['tokenIdx'] for entry in awList.values() if entry['value']]
 
 percentArgumentLanguage = \
@@ -2049,17 +2051,16 @@ percentArgumentLanguage = \
                  "percent",
                  json.dumps([('vwp_argumentation',['True'])])])
 
-#percentArgumentLanguage = round(len(aw) * 1.0 / len(tokens) * 100)
 print(percentArgumentLanguage, ' percent argument language in text')
-
 
 cli = parser.send(['CLUSTERINFO', document_label])
 if cli is None:
     raise Exception("No information on word clusters retrieved")
 
-cs = parser.send(['CONTENTSEGMENTS', document_label])
-if cs is None:
-    raise Exception("No information on content segments retrieved")
+csList = parser.send(['SUPPORTINGDETAILS', document_label])
+if csList is None:
+    raise Exception("No information on supporting detail segments retrieved")
+cs = [[entry['startToken'], entry['endToken']+1] for entry in csList]
 
 pl = parser.send(['PROMPTLANGUAGE', document_label])
 if pl is None:
@@ -2069,13 +2070,16 @@ pr = parser.send(['PROMPTRELATED', document_label])
 if tp is None:
     raise Exception("No information on related main idea words retrieved")
 
-core = parser.send(['CORESENTENCES', document_label])
-if core is None:
-    raise Exception("No information on core sentences retrieved")
+coreList = parser.send(['MAINIDEAS', document_label])
+if coreList is None:
+    raise Exception("No information on main ideas retrieved")
+core = [[entry['startToken'], entry['endToken']+1] for entry in coreList]
+print('core', core)
 
-ec = parser.send(['EXTENDEDCORESENTENCES', document_label])
-if ec is None:
-    raise Exception("No information on extended core sentences retrieved")
+ecList = parser.send(['SUPPORTINGIDEAS', document_label])
+if ecList is None:
+    raise Exception("No information on supporting idea sentences retrieved")
+ec = [[entry['startToken'], entry['endToken']+1] for entry in ecList]
 
 ps = parser.send(['PERSPECTIVESPANS', document_label])
 if ps is None:

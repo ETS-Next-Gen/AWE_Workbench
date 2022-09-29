@@ -1178,19 +1178,19 @@ class parserServer:
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
                     await websocket.send(json.dumps(doc._.prompt_related))
-                elif messagelist[0] == 'CORESENTENCES':
+                elif messagelist[0] == 'MAINIDEAS':
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
-                    await websocket.send(json.dumps(doc._.core_sentences))
-                elif messagelist[0] == 'EXTENDEDCORESENTENCES':
+                    await websocket.send(json.dumps(doc._.main_ideas))
+                elif messagelist[0] == 'SUPPORTINGIDEAS':
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
                     await websocket.send(json.dumps(
-                        doc._.extended_core_sentences))
-                elif messagelist[0] == 'CONTENTSEGMENTS':
+                        doc._.supporting_ideas))
+                elif messagelist[0] == 'SUPPORTINGDETAILS':
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
-                    await websocket.send(json.dumps(doc._.content_segments))
+                    await websocket.send(json.dumps(doc._.supporting_details))
                 elif messagelist[0] == 'CLUSTERINFO':
                     command = 'CLUSTERINFO'
                     # Get the local word clusters our algorithm has
