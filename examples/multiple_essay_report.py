@@ -966,7 +966,6 @@ def prepareArgumentWordMarking(tokens,
     inPromptSentences = []
     for i, item in enumerate(tokens):
         if core is not None and coreloc < len(core):
-            print(coreloc, core)
             start = core[coreloc][0]
             end = core[coreloc][1]
             if i >= start and i <= end:
@@ -1460,7 +1459,6 @@ asyncio.set_event_loop(loop)
 
 
 # Send spell corrected text to the parser
-#tokList = parser.send(['DOCTOKENS', document_label])
 tokList = parser.send(['AWE_INFO', document_label, 'text', 'Token'])
 tokens = [entry['value'] for entry in tokList.values()]
 
@@ -1478,8 +1476,6 @@ numWords = parser.send(['AWE_INFO',
 print('\nBasic info')
 print(numWords, ' words')
 
-#lemmaList = parser.send(['LEMMAS',
-#                document_label])
 lemmaList = parser.send(['AWE_INFO',
                           document_label,
                          'lemma_',
@@ -1487,9 +1483,6 @@ lemmaList = parser.send(['AWE_INFO',
                          
 lemmas = [entry['value'] for entry in lemmaList.values()]
 
-#numLemmas = len(set([lemma.lower()
-#                     for lemma in lemmas
-#                     if lemma is not None]))
 numLemmas = parser.send(['AWE_INFO',
                          document_label,
                         'lemma_', 'Token', 'totaluniq'])
@@ -1498,7 +1491,6 @@ print(numLemmas, ' distinct words')
 if lemmas is None:
     raise Exception("No lemmas recognized")
 
-rootList = parser.send(['ROOTS', document_label])
 rootList = parser.send(['AWE_INFO',
                           document_label,
                          'root',
@@ -1797,8 +1789,6 @@ print(percentFourPlusSyls, ' percent words with four or more syllables')
 print(percentThreePlusSyls, ' percent words with three or more syllables')
 print(percentTwoPlusSyls, ' percent words with two or more syllables')
 
-#stypeList = json.loads(parser.send(['SENTENCETYPES',
-#                                   document_label]))
 stypeList = parser.send(['AWE_INFO',
                         document_label,
                         'sentence_types', 'Doc'])
@@ -1843,48 +1833,53 @@ print('\nSentence Variety:')
 stypeCount = parser.send(['AWE_INFO',
                         document_label,
                         'sentence_types', 'Doc', 'counts'])
-for item in stypeCount:
-    for key in item:
-        if key == 'Simple':
-            print('Number of simple (kernel) sentences: ',
-                  item[key])
+                        
+for key in stypeCount.keys():
+    if key == 'Simple':
+        print('Number of simple (kernel) sentences: ',
+              stypeCount[key])
 
-        if key == 'SimpleComplexPred':
-            print('Number of simple sentences with complex predicates: ',
-                  item[key])
+    if key == 'SimpleComplexPred':
+        print('Number of simple sentences with complex predicates: ',
+              stypeCount[key])
 
-        if key == 'SimpleCompoundPred':
-            print('Number of simple sentences with compound predicates: ',
-                  item[key])
+    if key == 'SimpleCompoundPred':
+        print('Number of simple sentences with compound predicates: ',
+              stypeCount[key])
 
-        if key == 'SimpleCompoundComplexPred':
-            print('Number of simple sentences with compound/completx sentences: ',
-                  item[key])
+    if key == 'SimpleCompoundComplexPred':
+        print('Number of simple sentences with compound/completx sentences: ',
+              stypeCount[key])
 
-        if key == 'Complex':
-            print('Number of complex sentences: ',
-                  item[key])
+    if key == 'Complex':
+        print('Number of complex sentences: ',
+              stypeCount[key])
 
-        if key == 'Compound':
-            print('Number of compound sentences: ',
-                  item[key])
+    if key == 'Compound':
+        print('Number of compound sentences: ',
+              stypeCount[key])
 
-        if key == 'CompoundComplex':
-            print('Number of compound/complex sentences',
-                  item[key])
+    if key == 'CompoundComplex':
+        print('Number of compound/complex sentences',
+              stypeCount[key])
 
 #sumfeats = parser.send(['DOCSUMMARYFEATS',
 #                        document_label])
 #print('sumfeats', sumfeats)
 
 
-print('\nTransition Words and Phrases:')
-tp = parser.send(['TRANSITIONPROFILE', document_label])
+transitionList = parser.send(['AWE_INFO',
+                             document_label,
+                             'transitions', 'Doc'])
 
-if tp is None:
-    raise Exception("No information on transition words retrieved")
-prepcs = None
-transitions = prepareTransitionMarking(tokens, tp, prepcs)
+tlist = []
+for entry in transitionList.values():
+    category = entry['value']
+    sentStart = entry['startToken']
+    startToken = entry['startToken']
+    endToken = entry['endToken']
+    transition = entry['text']
+    tlist.append([transition, sentStart, startToken, endToken, category])
 
 numTransitions = parser.send(['AWE_INFO',
                              document_label,
@@ -1893,10 +1888,15 @@ numTransitions = parser.send(['AWE_INFO',
 transitionTypeProfile = parser.send(['AWE_INFO',
                                    document_label,
                                    'transitions', 'Doc', 'counts'])
+print('\nType Frequency')
+for item in transitionTypeProfile:
+        print(item, transitionTypeProfile[item])
+
+
 print('Number of transition words and phrases:', numTransitions)
 
 
-transitionTypeProfile = parser.send(["AWE_INFO",
+transitionProfile = parser.send(["AWE_INFO",
                                 document_label,
                                 "transitions",
                                 "Doc",
@@ -1904,8 +1904,17 @@ transitionTypeProfile = parser.send(["AWE_INFO",
                                 json.dumps([]),
                                 json.dumps(["text"])])
 print('\nType Frequency')
-for item in transitionTypeProfile:
-        print(item.replace('\n','PARA'), transitionTypeProfile[item])
+for item in transitionProfile:
+        print(item.replace('\n','PARA'), transitionProfile[item])
+
+
+print('\nTransition Words and Phrases:')
+tp = [numTransitions, transitionTypeProfile, transitionProfile, tlist]
+
+if tp is None:
+    raise Exception("No information on transition words retrieved")
+prepcs = None
+transitions = prepareTransitionMarking(tokens, tp, prepcs)
 
 print('\nQuotes, Citations, Attributions:')
 
@@ -2028,7 +2037,7 @@ if argew is None:
     raise Exception("No information on explicit argument words retrieved")
 eaw = [entry['tokenIdx'] for entry in argew.values() if entry['value']]
 
-print('explicit argument words', [(entry['text'], entry['tokenIdx']) for entry in argew.values() if entry['value']])
+print('explicit argument words', [entry['text'] for entry in argew.values() if entry['value']])
 
 argw = parser.send(["AWE_INFO",
                      document_label,
@@ -2053,49 +2062,60 @@ percentArgumentLanguage = \
 
 print(percentArgumentLanguage, ' percent argument language in text')
 
-cli = parser.send(['CLUSTERINFO', document_label])
-if cli is None:
+cliList = parser.send(["AWE_INFO",
+                       document_label,
+                       "all_cluster_info",
+                       "Doc"])
+if cliList is None:
     raise Exception("No information on word clusters retrieved")
+clDict = {}
+for entry in cliList.values():
+    clDict[entry['text']] = entry['value']
+for cluster in clDict:
+    print(json.loads(cluster), 'Count:', clDict[cluster][0], 'Importance:', clDict[cluster][1])
 
-csList = parser.send(['SUPPORTINGDETAILS', document_label])
+csList = parser.send(["AWE_INFO",
+                       document_label,
+                       "supporting_ideas",
+                       "Doc"])
+
 if csList is None:
     raise Exception("No information on supporting detail segments retrieved")
-cs = [[entry['startToken'], entry['endToken']+1] for entry in csList]
+cs = [[entry['startToken'], entry['endToken']+1] for entry in csList.values()]
 
 pl = parser.send(['PROMPTLANGUAGE', document_label])
 if pl is None:
     raise Exception("No information on main idea words retrieved")
+print(pl)
 
 pr = parser.send(['PROMPTRELATED', document_label])
+print(pr)
 if tp is None:
     raise Exception("No information on related main idea words retrieved")
 
-coreList = parser.send(['MAINIDEAS', document_label])
+coreList = parser.send(["AWE_INFO",
+                        document_label,
+                        "main_ideas",
+                        "Doc"])
 if coreList is None:
     raise Exception("No information on main ideas retrieved")
-core = [[entry['startToken'], entry['endToken']+1] for entry in coreList]
+core = [[entry['startToken'], entry['endToken']+1] for entry in coreList.values()]
 print('core', core)
 
-ecList = parser.send(['SUPPORTINGIDEAS', document_label])
-if ecList is None:
-    raise Exception("No information on supporting idea sentences retrieved")
-ec = [[entry['startToken'], entry['endToken']+1] for entry in ecList]
 
 ps = parser.send(['PERSPECTIVESPANS', document_label])
 if ps is None:
     raise Exception("No information on perspective spans retrieved")
-
-#third = ps['explicit_3']
-#for item in third:
-#    for loc in third[item]:
-#        print(tokens[loc])
 
 sm = parser.send(['STANCEMARKERS', document_label])
 
 if sm is None:
     raise Exception("No information on stance markers retrieved")
 
-pa = json.loads(parser.send(['PROPOSITIONALATTITUDES', document_label]))
+pa = parser.send(["AWE_INFO",
+                   document_label,
+                   "vwp_propositional_attitudes",
+                   "Doc"])
 if pa is None:
     raise Exception("No information on propositional"
                     + " attitudes retrieved")
@@ -2112,7 +2132,7 @@ print(percentCore,
       + ' and main points of an essay')
 
 percentSupporting = \
-    round(len(ec) * 1.0 / len(sentences) * 100)
+    round(len(cs) * 1.0 / len(sentences) * 100)
 
 print(percentSupporting,
       ' percent of sentences seem to express supporting points')
@@ -2127,7 +2147,7 @@ details, argumentwords = \
     prepareArgumentWordMarking(tokens, lemmas, aw,
                                eaw, pl, pr, cw, cs)
 
-supportingideas = prepareSupportingIdeas(ec)
+supportingideas = prepareSupportingIdeas(cs)
 
 essaystructure, argumentwords = \
     prepareArgumentWordMarking(tokens,
@@ -2149,8 +2169,9 @@ print(percentAllocentric,
 
 print('\nNarrative Language:')
 
-emList = json.loads(parser.send(['EMOTIONWORDS',
-                    document_label]))
+emList = parser.send(["AWE_INFO",
+                   document_label,
+                   "vwp_emotionword"])
 
 if emList is None:
     raise Exception("No information on emotion words retrieved")
@@ -2164,7 +2185,9 @@ percentEmotion = \
 
 print('Percent emotion words: ', percentEmotion)
 
-ctList = json.loads(parser.send(['CHARACTERWORDS', document_label]))
+ctList = parser.send(["AWE_INFO",
+                   document_label,
+                   "vwp_character"])
 if ctList is None:
     raise Exception("No information on character' \
                     + ' trait words retrieved")
@@ -2189,11 +2212,13 @@ print('Percent character trait words: ',
 # ct = flattenViewpointList(traits, tokens)
 # traitDisplay = prepareEmotionDisplay(ct, tokens)
 
-ds = parser.send(['DIRECTSPEECHSPANS', document_label])
+dsList = parser.send(["AWE_INFO",
+                  document_label,
+                  "direct_speech_spans",
+                  "Doc"])
 directspeech = []
-if ds is not None:
-    directSpeechList = json.loads(ds)
-    for item in directSpeechList.values():
+if dsList is not None:
+    for item in dsList.values():
         speaker = item['value'][0]
         addressee = item['value'][1]
         left = item['startToken']
@@ -2201,8 +2226,8 @@ if ds is not None:
         directspeech.append([speaker, addressee, [[left, right]]])
 countDirect = 0
 for item in directspeech:
-    for offset in item:
-        countDirect += 1
+    for span in item[2]:
+        countDirect += 1 + span[1] - span[0]
 
 percentDialogueIndicator = \
     round(1.0 * countDirect / len(tokens) * 100)
@@ -2220,16 +2245,22 @@ dialogueDisplay = displayDialogue(tokens,
                                   quotedtext,
                                   directspeech)
 
-in_direct_speech = parser.send(['IN_DIRECT_SPEECH',
-                               document_label])
+in_direct_speechList = parser.send(["AWE_INFO",
+                                document_label,
+                                "vwp_in_direct_speech"])
+in_direct_speech = [entry['value'] \
+        for entry \
+        in in_direct_speechList.values()]
 
 tensechanges = parser.send(['TENSECHANGES',
                            document_label])
 
-locList = json.loads(parser.send(['LOCATIONS',
-                                   document_label]))
-
-locs = [location for location in locList]
+locList = parser.send(["AWE_INFO",
+                     document_label,
+                     "location"])
+locs = [location['value'] \
+        for location \
+        in locList.values()]
 
 sceneSetting, numComments = \
     prepareSceneDisplay(tokens,
@@ -2257,9 +2288,10 @@ print(sceneWordPercent,
 print(numComments,
       ' number of shifts into present tense suggesting a comment')
 
-social_awarenessList = json.loads(
-    parser.send(['SOCIAL_AWARENESS',
-                 document_label]))
+social_awarenessList = parser.send(["AWE_INFO",
+                                    document_label,
+                                    "vwp_social_awareness",
+                                    "Doc"])
 
 social_awareness = [[entry['startToken'], entry['endToken']]
                    for entry in social_awarenessList.values()]
@@ -2285,8 +2317,13 @@ print(percentTheoryOfMindText,
       ' percent words expressing social awareness'
       + ' of other people\'s points of view')
 
-concretedetails = \
-    parser.send(['CONCRETEDETAILS', document_label])
+concretedetailsList = parser.send(["AWE_INFO",
+                        document_label,
+                        "concrete_detail"])
+concretedetails = [entry['tokenIdx'] \
+                   for entry \
+                   in concretedetailsList.values()
+                   if entry['value']]
 
 concreteDetailPage = \
     prepareConcreteDetailDisplay(tokens, concretedetails)
@@ -2312,8 +2349,6 @@ for key in characters:
         numCharsMultiRef += 1
         references.append(key)
 
-print(firstPersonRefs, ' first person references')
-
 print(numCharsMultiRef,
       ' characters referenced more than once '
       + '(repeated references to the same name or descriptive noun)')
@@ -2321,14 +2356,21 @@ print(numCharsMultiRef,
 print('List of references to people or characters:',
       sorted(references))
 
-#polarityList = json.loads(parser.send(['POLARITYRATINGS', document_label]))
-#pl = [entry['text'] for entry in polarityList.values() if entry['value']>0]
-#print('polarity words:', pl)
+polarityList = parser.send(["AWE_INFO",
+                        document_label,
+                        "polarity"])
+pl = [entry['text'] for entry in polarityList.values() if entry['value']>0]
+print('polarity words:', pl)
 
-toneList = json.loads(parser.send(['TONERATINGS', document_label]))
+toneList = parser.send(["AWE_INFO",
+                        document_label,
+                        "vwp_tone"])
+
 tone = [entry['value'] for entry in toneList.values()]
 
-stopwords = parser.send(['STOPWORDS', document_label])
+stopwords = parser.send(["AWE_INFO",
+                        document_label,
+                        "is_stop"])
 
 filteredtone = []
 for i, value in enumerate(tone):
@@ -2393,15 +2435,20 @@ print(percentNeutral, ' percent with neutral connotations')
 print(percentWeakNegative, ' percent with weak negative connotations')
 print(percentStrongNegative, ' percent with strong negative connotations')
 
-sfList = json.loads(parser.send(['STATEMENTSOFFACT', document_label]))
+sfList = parser.send(['AWE_INFO',
+                      document_label,
+                      'vwp_statements_of_fact',
+                      'Doc'])
 sf = [[entry['startToken'], entry['endToken']+1] for entry in sfList.values()]
 
-print('statements of fact', sf)
 factualStatements = prepareRangeMarking(tokens, sf)
 
-ofList = json.loads(parser.send(['STATEMENTSOFOPINION', document_label]))
+ofList = parser.send(['AWE_INFO',
+                      document_label,
+                      'vwp_statements_of_opinion',
+                      'Doc'])
+
 of = [[entry['startToken'], entry['endToken']+1] for entry in ofList.values()]
-print('statements of opinion', of)
 
 opinionStatements = prepareRangeMarking(tokens, of)
 

@@ -1069,7 +1069,8 @@ class parserServer:
                     command = 'CONCRETEDETAILS'
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
-                    await websocket.send(json.dumps(doc._.concrete_details))
+                    await websocket.send(
+                        doc._.AWE_Info(indicator='concrete_detail'))
                 elif messagelist[0] == 'INTERACTIVELANGUAGE':
                     command = 'INTERACTIVELANGUAGE'
                     # 1 interactive cue words 0 other
@@ -1181,16 +1182,21 @@ class parserServer:
                 elif messagelist[0] == 'MAINIDEAS':
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
-                    await websocket.send(json.dumps(doc._.main_ideas))
+                    await websocket.send(
+                        doc._.AWE_Info(infoType="Doc",
+                                       indicator='main_ideas'))
                 elif messagelist[0] == 'SUPPORTINGIDEAS':
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
-                    await websocket.send(json.dumps(
-                        doc._.supporting_ideas))
+                    await websocket.send(
+                        doc._.AWE_Info(infoType="Doc",
+                                       indicator='supporting_ideas'))
                 elif messagelist[0] == 'SUPPORTINGDETAILS':
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
-                    await websocket.send(json.dumps(doc._.supporting_details))
+                    await websocket.send(
+                        doc._.AWE_Info(infoType="Doc",
+                                       indicator='supporting_details'))
                 elif messagelist[0] == 'CLUSTERINFO':
                     command = 'CLUSTERINFO'
                     # Get the local word clusters our algorithm has
