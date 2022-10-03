@@ -242,7 +242,7 @@ def prepareSceneDisplay(tokens,
             inLoc = False
         else:
             if inLoc:
-            temp2.append(temp[i])
+                temp2.append(temp[i])
     while lastLoc < len(temp):
         temp2.append(temp[lastLoc])
         lastLoc += 1
