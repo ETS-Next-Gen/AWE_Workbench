@@ -9,11 +9,11 @@
 
 # Shared parameters:
 
-PYTHON_CMD="python"
+PYTHON_CMD="python3.10"
 PIP_CMD="pip"
 
 VIRTUAL_ENV_LOC="../../../VirtualENVs"
-VIRTUAL_ENV_NAME="AWEWorkbenchVENV"
+VIRTUAL_ENV_NAME="AWEWorkbenchVENV310"
 
 CODE_REPOS_LOC="../../"
 
@@ -34,6 +34,9 @@ echo "=== generating venv ==="
 # Initialize
 echo -e "\n=== Starting venv ==="
 source "$VIRTUAL_ENV_LOC/$VIRTUAL_ENV_NAME/bin/activate"
+
+# Update the Pip Version.
+pip install --upgrade pip
 
 
 # ----------------------------------------------------------
@@ -74,11 +77,11 @@ pip install -e "$CODE_REPOS_LOC/AWE_Workbench"
 
 echo -e "\n\n=== Installing shared data. ==="
 
+# Should be unneeded.
 # Install spacy en_core_web_sm
-python -m spacy download en_core_web_sm
-
+#python -m spacy download en_core_web_sm
 # NLK Data.
-python -m nltk.downloader all
+#python -m nltk.downloader all
 
 # And set up the data.
 #python -m awe_workbench.setup.data --install (--develop if installing in development mode)
