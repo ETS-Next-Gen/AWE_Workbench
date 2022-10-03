@@ -154,6 +154,7 @@ def prepareSceneDisplay(tokens,
                         transitions,
                         in_direct_speech,
                         tense_changes,
+                        in_past_tense_scope,
                         locations):
     loc = 0
     temp = []
@@ -162,6 +163,7 @@ def prepareSceneDisplay(tokens,
     startHighlight = 0
     numPastTokens = 0
     lastchange = None
+    inComment = False
     for change in tense_changes:
         if lastchange is not None \
            and (not change['past']
@@ -171,25 +173,46 @@ def prepareSceneDisplay(tokens,
             numPastTokens += change['loc'] - lastchange['loc']
         present = False
         newloc = change['loc']
-        if not change['past'] and not in_direct_speech[newloc]:
+        if inComment and in_past_tense_scope[newloc]:
+            while newloc > 0 and in_past_tense_scope[newloc - 1]:
+                newloc -= 1
+            temp += tokens[loc:newloc]
+            temp.append('</strong>'+tokens[newloc])
+            inComment = False
+            present = False
+            loc = newloc+1        
+        elif not change['past'] and not in_direct_speech[newloc]:
             startHighlight = newloc
-            if not present:
-                newloc = change['loc']
-                temp += tokens[loc:newloc]
-                temp.append('<strong style="background-color: #c39bd3">')
+            if not in_past_tense_scope[newloc]:
+                present = True
+                if newloc-1 != loc and newloc != loc:
+                    temp += tokens[loc:newloc-1]
+                temp.append(tokens[newloc - 1] + '<strong style="background-color: #c39bd3">')
+                inComment = True
                 present = True
                 numComments += 1
                 loc = newloc
-            else:
-                newloc = change['loc']
-                temp += tokens[loc:newloc]
+            elif not in_past_tense_scope[newloc]:
+                present = False
+                temp += tokens[loc:newloc-1]
                 present = True
                 loc = newloc
+            else:
+                while newloc > 0 and in_past_tense_scope[newloc - 1]:
+                    newloc -= 1
+                temp += tokens[loc:newloc]
+                temp.append('</strong>'+tokens[newloc])
+                inComment = False
+                present = False
+                loc = newloc+1
         else:
+            while newloc > 0 and in_past_tense_scope[newloc - 1]:
+                newloc -= 1
             newloc = change['loc']
             temp += tokens[loc:newloc]
-            if newloc > 0:
+            if newloc > 0 or in_past_tense_scope[newloc]:
                 temp.append('</strong>'+tokens[newloc])
+                inComment = False
             else:
                 temp.append(tokens[newloc])
             present = False
@@ -218,6 +241,7 @@ def prepareSceneDisplay(tokens,
             temp2.append('</span>' + temp[i])
             inLoc = False
         else:
+            if inLoc:
             temp2.append(temp[i])
     while lastLoc < len(temp):
         temp2.append(temp[lastLoc])
@@ -227,19 +251,17 @@ def prepareSceneDisplay(tokens,
     loc = 0
     output = ''
     for transition in transitions:
-        breakloc = transition[1]
         start = transition[2]
         end = transition[3]
         if transition[4] != 'temporal' or in_direct_speech[start]:
             output += ' '.join(temp[loc:end]) + ' '
             loc = end
         else:
-            output += ' '.join(temp[loc:breakloc])
-            output += ' '.join(temp[breakloc:start])
+            output += ' '.join(temp[loc:start+2])
             output += ' <span style="background-color: #90ee90"> '
-            output += ' '.join(temp[start:end+1])
+            output += ' '.join(temp[start+2:end+3])
             output += ' </span> '
-            loc = end+1
+            loc = end+3
     output += ' '.join(temp[loc:len(temp)])
     headstr = '<ul><li><span style="background-color: #90ee90">' \
               + 'Times</span></li><li><span style=' \
@@ -1571,8 +1593,6 @@ posinfoList = parser.send(['AWE_INFO',
                          document_label,
                          'pos_', 'Token', 'counts'])
 
-print(posinfoList)
-
 if posinfoList is None:
     raise Exception("No part of speech information retrieved")
 
@@ -2214,7 +2234,7 @@ print('Percent character trait words: ',
 
 dsList = parser.send(["AWE_INFO",
                   document_label,
-                  "direct_speech_spans",
+                  "vwp_direct_speech_spans",
                   "Doc"])
 directspeech = []
 if dsList is not None:
@@ -2258,15 +2278,37 @@ tensechanges = parser.send(['TENSECHANGES',
 locList = parser.send(["AWE_INFO",
                      document_label,
                      "location"])
+locs = [False]*len(locList)
+for key in locList:
+    if locList[key]['value']:
+        print('location:', locList[key]['text'])
+
 locs = [location['value'] \
         for location \
         in locList.values()]
+print(len(locList), len(locs))
+
+
+for i, token in enumerate(tokens):
+    if locs[i]:
+        print('loc2:', token)
+
+in_past_tense_scopeList = parser.send(["AWE_INFO",
+                                  document_label,
+                                  "in_past_tense_scope"])
+in_past_tense_scope = [entry['value']
+                       for entry
+                       in in_past_tense_scopeList.values()]
+
+for i, token in enumerate(tokens):
+    print(token, in_past_tense_scope[i])
 
 sceneSetting, numComments = \
     prepareSceneDisplay(tokens,
                         tp[3],
                         in_direct_speech,
                         tensechanges,
+                        in_past_tense_scope,
                         locs)
 
 temporalCount = 0
@@ -2452,6 +2494,11 @@ of = [[entry['startToken'], entry['endToken']+1] for entry in ofList.values()]
 
 opinionStatements = prepareRangeMarking(tokens, of)
 
+egocentric = parser.send(["AWE_INFO",
+                        document_label,
+                        "vwp_egocentric"])
+
+        
 if option2 == 'Conventions':
     st.write(proofread, unsafe_allow_html=True)
 elif option2 == 'Parts of Speech':
