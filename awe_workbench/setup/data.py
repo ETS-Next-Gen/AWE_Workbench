@@ -22,6 +22,7 @@ class data:
         # Location is different depending on whether we're in install or
         # develop mode.
         if install:
+            os.system('python -m nltk.downloader all')
             os.system('python -m awe_languagetool.setup.data --install')
             os.system('python -m awe_spellcorrect.setup.data --install')
             os.system('python -m awe_components.setup.data')
