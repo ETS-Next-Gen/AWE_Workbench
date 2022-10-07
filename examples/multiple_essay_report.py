@@ -1277,10 +1277,10 @@ for i, fname in enumerate(locs):
 document_labels = []
 if option0 == 'GRE Essays':
     for i in range(2, 7):
-        document_labels.append('Essay ' + str(i))
+        document_labels.append('GRE_Essay ' + str(i))
 elif option0 == 'Censorship Essays':
     for i in range(1, 26):
-        document_labels.append('Essay ' + str(i))
+        document_labels.append('Censorship_Essay ' + str(i))
 else:
     for i in range(1, 3):
         document_labels.append('Story ' + str(i))
