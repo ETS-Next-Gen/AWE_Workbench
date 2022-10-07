@@ -389,7 +389,6 @@ class parserServer:
                     else:
                         await websocket.send(json.dumps([]))
                 elif messagelist[0] == 'DOCTOKENS':
-                    command = 'DOCTOKENS'
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
                     if doc is not None:
@@ -397,6 +396,15 @@ class parserServer:
                             doc._.AWE_Info(indicator='text'))
                     else:
                         await websocket.send(json.dumps([]))
+                elif messagelist[0] == 'DOCTOKENS_WITH_WS':
+                    label = messagelist[1]
+                    doc = self.parser.get_document(label)
+                    if doc is not None:
+                        await websocket.send(
+                            doc._.AWE_Info(indicator='text_with_ws'))
+                    else:
+                        await websocket.send(json.dumps([]))
+
                 elif messagelist[0] == 'DOCHEADS':
                     command = 'DOCHEADS'
                     # Position in the list returned equals position
@@ -918,8 +926,11 @@ class parserServer:
                     # these perspectives  apply.
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
-                    await websocket.send(json.dumps(
-                        doc._.vwp_perspective_spans))
+#                    await websocket.send(json.dumps(
+#                        doc._.vwp_perspective_spans))
+                    await websocket.send(
+                        doc._.AWE_Info(infoType="Doc",
+                                       indicator='vwp_perspective_spans'))
                 elif messagelist[0] == 'STANCEMARKERS':
                     command = 'STANCEMARKERS'
                     # Stance marker tokens identified by our perspective
@@ -945,30 +956,10 @@ class parserServer:
                     # which these perspectives apply.
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
-                    await websocket.send(json.dumps(doc._.vwp_stance_markers))
-                elif messagelist[0] == 'PERSPECTIVESPANS':
-                    command = 'PERSPECTIVESPANS'
-                    # Returns a dictionary with
-                    # 1.Implicit: Spans whose perspective is implicitly that of
-                    #   the speaker/author
-                    # 2. First person: Spans whose perspective is explicitly
-                    #    that of the speaker/author, indicated by first person
-                    #    pronouns
-                    # 3. Second person: Spans whose perspective is explicitly
-                    #    that of the audience, indicated by second person
-                    #    pronouns
-                    #
-                    # 4. Third person: Spans whose perspective is that of some
-                    #    other agent. This key has subkeys corresponding to the
-                    #    offsets of the noun/proper noun referring to the
-                    #    viewpoint  entity.
-                    #
-                    # Each of these keys is associated with a list of offsets,
-                    # whichcorresponds to the perspective spans to which
-                    # these perspectives apply.
-                    label = messagelist[1]
-                    doc = self.parser.get_document(label)
-                    await websocket.send(json.dumps(doc._.vwp_stance_markers))
+#                    await websocket.send(json.dumps(doc._.vwp_stance_markers))
+                    await websocket.send(
+                        doc._.AWE_Info(infoType="Doc",
+                                       indicator='vwp_stance_markers'))
 
                 elif messagelist[0] == 'CLAIMTEXTS':
                     # Returns a sequence of true/false flags corresponding to
@@ -1004,30 +995,15 @@ class parserServer:
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
                     await websocket.send(json.dumps(
-                        doc._.AWE_Info(indicator='vwp_character')))
+                        doc._.AWE_Info(indicator='vwp_character_traits')))
 
                 elif messagelist[0] == 'EMOTIONALSTATES':
                     command = 'EMOTIONALSTATES'
-                    # Returns a dictionary with four top level keys:
-                    # 1.Implicit: Spans whose perspective is implicitly that
-                    #   of the speaker/author
-                    # 2. First person: Spans whose perspective is explicitly
-                    #    that of the speaker/author, indicated by first person
-                    #    pronouns.
-                    # 3. Second person: Spans whose perspective is explicitly
-                    #    that of the audience, indicated by second person
-                    #    pronouns
-                    # 4. Third person: Spans whose perspective is that of
-                    #    some other agent. This key has subkeys corresponding
-                    #    to the offsets of the noun/proper noun referring to
-                    #    the viewpoint entity.
-                    #
-                    # Each of these keys is associated with a list of offsets,
-                    # which corresponds to emotion predicates that apply to
-                    # these perspectives
                     label = messagelist[1]
                     doc = self.parser.get_document(label)
-                    await websocket.send(json.dumps(doc._.vwp_emotion_states))
+                    await websocket.send(
+                        doc._.AWE_Info(infoType="Doc",
+                                       indicator='vwp_emotion_states'))
                 elif messagelist[0] == 'CHARACTERTRAITS':
                     command = 'CHARACTERTRAITS'
                     # Returns a dictionary with four top level keys:
