@@ -367,8 +367,7 @@ def prepareToneDisplay(tone,
     countB5 = 0
     for i, token in enumerate(tokens):
         if posinfo[i] in ['PUNCT', 'SPACE', 'SYM'] \
-           or '\'' in tokens[i] \
-           or syl[i] is None:
+           or '\'' in tokens[i]:
             outhtml += tokens[i] + ' '
         elif tone[i] > 0.4:
             if threshold1:
@@ -1724,6 +1723,13 @@ def syllableOptions():
 
 def sentenceTypeOptions():
 
+    sents = parser.send(["AWE_INFO",
+                         document_label,
+                         "sents",
+                         "Doc"])
+
+    sentences = [[sents[idx]['startToken'], sents[idx]['endToken']] for idx in sents]
+
     posinfoList2 = parser.send(['AWE_INFO',
                                 document_label,
                                 'pos_', 'Token'])
@@ -1788,6 +1794,13 @@ def sentenceTypeOptions():
 
 def quoteCiteOptions():
     print('\nQuotations:')
+
+    quotedtextList = parser.send(["AWE_INFO",
+                                  document_label,
+                                  "vwp_quoted"])
+    if quotedtextList is None:
+        raise Exception("No quoted text information received")
+    quotedtext = [entry['value'] for entry in quotedtextList.values()]
 
     numQuotes = 0
     quotedLast = False
@@ -1892,13 +1905,6 @@ def quoteCiteOptions():
 
     print('\n', numCites, ' citation(s)')
     print(numCitedWords, ' cited words(s)')
-
-    quotedtextList = parser.send(["AWE_INFO",
-                                  document_label,
-                                  "vwp_quoted"])
-    if quotedtextList is None:
-        raise Exception("No quoted text information received")
-    quotedtext = [entry['value'] for entry in quotedtextList.values()]
 
     quoteCite = prepareQuoteCite(quotedtext,
                                  attributions,
@@ -2019,6 +2025,22 @@ def sceneSettingOptions():
     print('\nTransition Words and Phrases:')
     tp = [numTransitions, transitionTypeProfile, transitionProfile, tlist]
 
+    transition_categoriesList = parser.send(['AWE_INFO',
+                                 document_label,
+                                 'transition_category', 'Token'])
+
+    in_direct_speechList = parser.send(['AWE_INFO',
+                                        document_label,
+                                        'vwp_in_direct_speech', 'Token'])
+
+    in_past_tense_scopeList = parser.send(['AWE_INFO',
+                                           document_label,
+                                           'in_past_tense_scope', 'Token'])
+
+    locList = parser.send(['AWE_INFO',
+                      document_label,
+                     'location', 'Token'])
+
     sceneSetting, numComments = \
         prepareSceneDisplay(ctext,
                             tok_with_wsList,
@@ -2114,6 +2136,13 @@ def toneOptions():
     stopwords = parser.send(["AWE_INFO",
                             document_label,
                             "is_stop"])
+
+    posinfoList = parser.send(['AWE_INFO',
+                               document_label,
+                              'pos_',
+                              'Token'])
+    posinfo = [entry['value'] \
+        for entry in posinfoList.values()]
 
     filteredtone = []
     for i, value in enumerate(tone):
@@ -2312,6 +2341,11 @@ def subjectivityOptions(option2, option3):
 def argumentWordOptions():
     print('\nArgument Language:')
 
+
+    lemmaList = parser.send(['AWE_INFO',
+                             document_label,
+                             'lemma_', 'Token'])
+    lemmas = [entry['text'] for entry in lemmaList.values()]
     argew = parser.send(["AWE_INFO",
                          document_label,
                          "vwp_explicit_argument"])
@@ -2386,7 +2420,12 @@ def mainIdeaOptions():
         raise Exception("No information on main ideas retrieved")
     core = [[entry['startToken'], entry['endToken']+1] for entry in coreList.values()]
 
-    percentCore = round(len(core) * 1.0 / len(sentences) * 100)
+    sents = parser.send(["AWE_INFO",
+                         document_label,
+                         "sents",
+                         "Doc"])
+
+    percentCore = round(len(core) * 1.0 / len(sents) * 100)
     print(percentCore,
           ' percent of sentences seem to express the thesis'
           + ' and main points of an essay')
@@ -2404,13 +2443,18 @@ def supportingIdeaOptions():
         raise Exception("No information on supporting detail segments retrieved")
     cs = [[entry['startToken'], entry['endToken']+1] for entry in csList.values()]
 
+    sents = parser.send(["AWE_INFO",
+                         document_label,
+                         "sents",
+                         "Doc"])
+
     percentSupporting = \
-        round(len(cs) * 1.0 / len(sentences) * 100)
+        round(len(cs) * 1.0 / len(sents) * 100)
 
     print(percentSupporting,
           ' percent of sentences seem to express supporting points')
 
-    percentDetail = round(len(cs) * 1.0 / len(sentences) * 100)
+    percentDetail = round(len(cs) * 1.0 / len(sents) * 100)
 
     supportingideas = prepareSupportingIdeas(cs)
     return supportingideas
@@ -2423,7 +2467,13 @@ def prepareDetailOptions():
     if csList is None:
         raise Exception("No information on supporting detail segments retrieved")
     cs = [[entry['startToken'], entry['endToken']+1] for entry in csList.values()]
-    percentDetail = round(len(cs) * 1.0 / len(sentences) * 100)
+
+    sents = parser.send(["AWE_INFO",
+                         document_label,
+                         "sents",
+                         "Doc"])
+
+    percentDetail = round(len(cs) * 1.0 / len(sents) * 100)
 
     print(percentDetail,
           ' percent of sentences seem to provide details'
@@ -2431,6 +2481,19 @@ def prepareDetailOptions():
 
     details = prepareSupportingIdeas(cs)
     return details
+
+def propositionalAttitudeOptions():
+    pa = parser.send(["AWE_INFO",
+                      document_label,
+                      "vwp_propositional_attitudes",
+                      "Doc"])
+
+    if pa is None:
+        raise Exception("No information on propositional"
+                        + " attitudes retrieved")
+
+    pa_display = displaySingleList(tokList, pa)
+    return pa_display
 
 if option2 == 'Conventions':
     proofread = proofreadOptions()
@@ -2478,16 +2541,7 @@ elif option2 == 'Argument Words':
     argumentWords =  argumentWordOptions()
     st.write(argumentWords, unsafe_allow_html=True)
 elif option2 == 'Propositional Attitudes':
-    pa = parser.send(["AWE_INFO",
-                      document_label,
-                      "vwp_propositional_attitudes",
-                      "Doc"])
-
-    if pa is None:
-        raise Exception("No information on propositional"
-                        + " attitudes retrieved")
-
-    pa_display = displaySingleList(tokList, pa)
+    pa_display = propositionalAttitudeOptions()
     st.write(pa_display, unsafe_allow_html=True)
 elif option2 == 'Own vs. Other Perspectives':
     subjectivities = subjectivityOptions(option2, option3)
