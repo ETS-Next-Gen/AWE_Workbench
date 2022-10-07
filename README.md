@@ -26,7 +26,7 @@ Basic usage to get the program running as a set of servers, which can then be ca
 python -m awe_workbench.web.startServers 
           (use the -fp flag to deactivate a couple of resource-intensive functions,
           including the coreference module, coreferee).
-python -m awe_workbench.wordprobs.wordseqProbabilityServer
+python -m awe_components.wordprobs.wordseqProbabilityServer
           (only currently used if coreferee is called, so you don't need to start
           this module if the -fp flag is used in the previous call.)
           
