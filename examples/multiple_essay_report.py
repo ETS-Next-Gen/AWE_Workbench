@@ -1381,51 +1381,22 @@ if tokens is None or len(tokens)==0:
 numWords = parser.send(['AWE_INFO',
                         document_label,
                         'text', 'Token', 'total'])
-
-print('\nBasic info')
-print(numWords, ' words')
-
-lemmaList = parser.send(['AWE_INFO',
-                          document_label,
-                         'lemma_',
-                         'Token'])
-                         
-lemmas = [entry['value'] for entry in lemmaList.values()]
-
 numLemmas = parser.send(['AWE_INFO',
                          document_label,
                         'lemma_', 'Token', 'totaluniq'])
-
-print(numLemmas, ' distinct words')
-if lemmas is None:
-    raise Exception("No lemmas recognized")
-
-sentenceList = parser.send(['AWE_INFO',
-                           document_label, 'sents', 'Doc'])
-
-sentences = [(sentence['startToken'],
-              sentence['endToken']+1) 
-              for sentence in sentenceList.values()]
-
-if sentences is None:
-    raise Exception("No sentences recognized")
-
 numSentences = parser.send(['AWE_INFO',
                            document_label,
                            'sents', 'Doc', 'total'])
+numParas = parser.send(['AWE_INFO',
+                        document_label,
+                        'delimiter_\n',
+                        'Doc',
+                        'total'])
+
+print('\nBasic info')
+print(numWords, ' words')
+print(numLemmas, ' distinct words')
 print(numSentences, ' Sentences')
-
-
-paragraphList = parser.send(['AWE_INFO',
-                           document_label,
-                           'delimiter_\n', 'Doc'])
-paragraphs = [(paragraph['startToken'],
-               paragraph['endToken']+1)
-              for paragraph in paragraphList.values()]
-
-if paragraphs is None:
-    raise Exception("No paragraphs recognized")
-numParas = len(paragraphs)
 print(numParas, ' paragraphs')
 
 
