@@ -209,6 +209,32 @@ def prepareSceneDisplay(text,
                 tokens[index]['text']
     displayText += '</body></html>'
     return displayText, numComments
+
+
+def displaySingleList(tokList, valueList):
+
+    # reformat for convenience
+    values = [False] * len(tokens)
+    for entry in valueList:
+        for loc in range(valueList[entry]['startToken'],
+                         valueList[entry]['endToken']+1):
+            values[loc] = True
+
+    tokens2 = []
+    outhtml = '<!DOCTYPE html><html><head></head><body>'
+    for index in tokList:
+       token = tokList[index]['text']
+       highlight = False
+       if values[int(index)]:
+           highlight = True
+       if highlight:
+           outhtml += \
+               '<span style="background-color: yellow">' \
+               + token + '</span>'
+       else:
+           outhtml += token
+    outhtml += '</body></html>'
+    return outhtml
     
 
 def displayDialogue(tokList, quotedTextList, dsList):
@@ -1281,6 +1307,7 @@ option2 = st.selectbox('',
                         'Statements of Fact',
                         'Statements of Opinion',
                         'Argument Words',
+                        'Propositional Attitudes',
                         'Own vs. Other Perspectives',
                         'Characters',
                         'Emotion Words',
@@ -1429,20 +1456,6 @@ roots = pd.DataFrame.from_dict(rootList, orient='index')
 roots.index.name = 'Root'
 roots.columns = ['Frequency']
 print(roots)
-
-pa = parser.send(["AWE_INFO",
-                   document_label,
-                   "vwp_propositional_attitudes",
-                   "Doc"])
-
-                   
-if pa is None:
-    raise Exception("No information on propositional"
-                    + " attitudes retrieved")
-
-pa_display = [str(entry['value']) + '\t' + entry['text'] for entry in pa.values()]
-#print('Propositional Attitudes')
-#print(pa_display)
 
 def proofreadOptions():
     result = lt.processText(record, document_text)
@@ -2464,6 +2477,18 @@ elif option2 == 'Quotations, Citations, Attributions':
 elif option2 == 'Argument Words':
     argumentWords =  argumentWordOptions()
     st.write(argumentWords, unsafe_allow_html=True)
+elif option2 == 'Propositional Attitudes':
+    pa = parser.send(["AWE_INFO",
+                      document_label,
+                      "vwp_propositional_attitudes",
+                      "Doc"])
+
+    if pa is None:
+        raise Exception("No information on propositional"
+                        + " attitudes retrieved")
+
+    pa_display = displaySingleList(tokList, pa)
+    st.write(pa_display, unsafe_allow_html=True)
 elif option2 == 'Own vs. Other Perspectives':
     subjectivities = subjectivityOptions(option2, option3)
     st.write(subjectivities, unsafe_allow_html=True)
