@@ -1100,9 +1100,7 @@ def prepareSubjectivityDisplay(tokens, ps, sm, option2, option3):
 
     print(sm)
     stancemarkers = [False] * len(tokens)
-    for entry in sm:
-        print(entry)
-    stancelocs = [sm[entry]['startToken'] for entry in sm]
+    stancelocs = [entry['startToken'] for entry in sm]
     for i, token in enumerate(tokens):
         if i in stancelocs:
             stancemarkers[i] = True
@@ -1110,8 +1108,8 @@ def prepareSubjectivityDisplay(tokens, ps, sm, option2, option3):
     print(ps)
     perspectives = ['WRITER'] * len(tokens)
     for entry in ps:
-        index = int(ps[entry]['startToken'])
-        value = ps[entry]['value']
+        index = int(entry['startToken'])
+        value = entry['value']
         if type(value) == str:
             perspectives[index] = value
         elif type(value) == int:

@@ -350,7 +350,7 @@ class parserServer:
                     result = doc._.AWE_Info(indicator=indic,
                                             infoType=itype,
                                             summaryType=summ)
-                    if type(result) in [int, float]:
+                    if type(result) in [int, float, bool]:
                         await websocket.send(str(result))
                     else:
                         await websocket.send(result)
@@ -374,7 +374,6 @@ class parserServer:
                     summ = messagelist[4]
                     filt = json.loads(messagelist[5])
                     trans = json.loads(messagelist[6])
-                    print(indic, '|', itype, '|', summ, '|', filt, '|', trans)
                     result = doc._.AWE_Info(indicator=indic,
                                        infoType=itype,
                                        summaryType=summ,
