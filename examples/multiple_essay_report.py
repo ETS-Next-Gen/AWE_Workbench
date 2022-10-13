@@ -7,6 +7,7 @@ import asyncio
 import html
 import os
 import json
+import pandas as pd
 
 from annotated_text import annotated_text
 from awe_workbench.web.websocketClient import websocketClient
@@ -150,174 +151,122 @@ def prepareConcreteDetailDisplay(tokens, details):
     return normalize(output)
 
 
-def prepareSceneDisplay(tokens,
+def prepareSceneDisplay(text,
+                        tokens,
                         transitions,
                         in_direct_speech,
-                        tense_changes,
+                        in_past_tense_scope,
                         locations):
-    loc = 0
-    temp = []
-    numComments = 0
-    present = False
-    startHighlight = 0
-    numPastTokens = 0
-    lastchange = None
-    for change in tense_changes:
-        if lastchange is not None \
-           and (not change['past']
-                or in_direct_speech[change['loc']]
-                or tokens[lastchange['loc']]
-                in ['"', '"', "'", '“', '”', "''", '``']):
-            numPastTokens += change['loc'] - lastchange['loc']
-        present = False
-        newloc = change['loc']
-        if not change['past'] and not in_direct_speech[newloc]:
-            startHighlight = newloc
-            if not present:
-                newloc = change['loc']
-                temp += tokens[loc:newloc]
-                temp.append('<strong style="background-color: #c39bd3">')
-                present = True
-                numComments += 1
-                loc = newloc
-            else:
-                newloc = change['loc']
-                temp += tokens[loc:newloc]
-                present = True
-                loc = newloc
-        else:
-            newloc = change['loc']
-            temp += tokens[loc:newloc]
-            if newloc > 0:
-                temp.append('</strong>'+tokens[newloc])
-            else:
-                temp.append(tokens[newloc])
-            present = False
-            loc = newloc+1
-        lastchange = change
-    temp += tokens[loc:len(tokens)-1]
-    if present:
-        temp.append('</strong>' + tokens[len(tokens)-1])
-    else:
-        temp.append(tokens[len(tokens)-1])
 
-    print('num past tokens: ', numPastTokens)
-    if numPastTokens * 1.0 / len(tokens) < .6 or numComments <= 1:
-        temp = tokens
-
-    loc = 0
-    temp2 = []
-    inLoc = False
-    lastLoc = 0
-    for i, locFlag in enumerate(locations):
-        lastLoc = i
-        if not inLoc and locFlag:
-            temp2.append('<span style="background-color: yellow">'+temp[i])
-            inLoc = True
-        elif inLoc and not locFlag:
-            temp2.append('</span>' + temp[i])
-            inLoc = False
-        else:
-            temp2.append(temp[i])
-    while lastLoc < len(temp):
-        temp2.append(temp[lastLoc])
-        lastLoc += 1
-    temp = temp2
-
-    loc = 0
-    output = ''
-    for transition in transitions:
-        breakloc = transition[1]
-        start = transition[2]
-        end = transition[3]
-        if transition[4] != 'temporal' or in_direct_speech[start]:
-            output += ' '.join(temp[loc:end]) + ' '
-            loc = end
-        else:
-            output += ' '.join(temp[loc:breakloc])
-            output += ' '.join(temp[breakloc:start])
-            output += ' <span style="background-color: #90ee90"> '
-            output += ' '.join(temp[start:end+1])
-            output += ' </span> '
-            loc = end+1
-    output += ' '.join(temp[loc:len(temp)])
+    displayText = '<!DOCTYPE html><html><head></head><body>'
     headstr = '<ul><li><span style="background-color: #90ee90">' \
               + 'Times</span></li><li><span style=' \
-              + '"background-color: yellow">Places</span>'
-    if numPastTokens * 1.0 / len(tokens) >= .6 \
-       and numComments > 1:
-        headstr += \
-            '<li><span style="background-color: #c39bd3">Comments</span></li>'
-    headstr += '</ul><hr>'
-    outhtml = '<!DOCTYPE html><html><head></head><body>'
-    outhtml += headstr
-    outhtml += normalize(output.replace('  ',
-                                        ' ').replace('\n',
-                                                     ' <br />'))
-    outhtml += '</body></html>'
-    return outhtml, numComments
+              + '"background-color: yellow">Places</span></li>' \
+              + '<li><span style="background-color: #c39bd3">Comments</span></li></ul>'
+    displayText += headstr
+    numComments = 0
+    numPresent = 0
+    lastCommentIndex = -2
+    for index in tokens:
+        if index in in_past_tense_scope \
+           and not in_past_tense_scope[index]['value']:
+            numPresent += 1
+    for index in tokens:
+        tenseInfo = False
+        if index in in_past_tense_scope:
+            tenseInfo = in_past_tense_scope[index]['value']
+        directSpeech = False
+        if index in in_direct_speech:
+            directSpeech = in_direct_speech[index]['value']
+        location = False
+        if index in locations:
+            location = locations[index]['value']
+        temporal = False
+        if index in transitions:
+            value = transitions[index]['value']
+            if value is not None and value == 'temporal':
+                temporal = True
+        if location:
+            displayText += \
+                '<span style="background-color: yellow">' \
+                + tokens[index]['text'] \
+                + '</span>'
+        elif temporal:
+            displayText += \
+                '<span style="background-color: #90ee90">' \
+                + tokens[index]['text'] \
+                + '</span>'
+        elif not tenseInfo and 1.0*numPresent/len(tokens)<.25:
+            if lastCommentIndex + 1 < int(index):
+                numComments+=1
+            lastCommentIndex = int(index)
+            displayText += \
+                '<span style="background-color: #c39bd3">' \
+                + tokens[index]['text'] \
+                + '</span>'
+        else:
+            displayText += \
+                tokens[index]['text']
+    displayText += '</body></html>'
+    return displayText, numComments
 
 
-def displayDialogue(tokens, quoted, directspeech):
+def displaySingleList(tokList, valueList):
+
+    # reformat for convenience
+    values = [False] * len(tokens)
+    for entry in valueList:
+        for loc in range(valueList[entry]['startToken'],
+                         valueList[entry]['endToken']+1):
+            values[loc] = True
+
     tokens2 = []
-    first = 0
-    for (speakers, addressees, locs) in directspeech:
-        for loc in locs:
-            last = loc[0]
-            tokens2.append(' '.join(tokens[first:last]))
+    outhtml = '<!DOCTYPE html><html><head></head><body>'
+    for index in tokList:
+       token = tokList[index]['text']
+       highlight = False
+       if values[int(index)]:
+           highlight = True
+       if highlight:
+           outhtml += \
+               '<span style="background-color: yellow">' \
+               + token + '</span>'
+       else:
+           outhtml += token
+    outhtml += '</body></html>'
+    return outhtml
+    
 
-            first = loc[0]
-            x = first
+def displayDialogue(tokList, quotedTextList, dsList):
 
-            last = loc[1]+1
-            y = last
-            if first < len(tokens) \
-               and re.match('\s+', tokens[first]):
-                first += 1
-            while (first < len(tokens)
-                   and not quoted[first]
-                   and not re.match('\s+', tokens[first])
-                   and tokens[first] != '"'
-                   and tokens[first] != "'"
-                   and tokens[first] != "''"
-                   and tokens[first] != '``'
-                   and tokens[first] != '”'
-                   and tokens[first] != '“'
-                   and first <= last):
-                first += 1
+    # reformat for convenience
+    tokens = [entry['value'] for entry in tokList.values()]
+    quoted = [entry['value'] for entry in quotedTextList.values()]
+    directspeech = [False] * len(tokens)
+    for entry in dsList:
+        for loc in range(dsList[entry]['startToken'],
+                         dsList[entry]['endToken']+1):
+            directspeech[loc] = True
 
-            while (not quoted[last - 1]
-                   and tokens[last - 1] != '"'
-                   and tokens[last - 1] != "'"
-                   and tokens[last - 1] != "''"
-                   and tokens[last - 1] != '``'
-                   and tokens[last - 1] != '”'
-                   and tokens[last - 1] != '“'
-                   and last > 0
-                   and first < last):
-                last -= 1
-            if x != first:
-                while re.match('\s+', tokens[x]):
-                    tokens2.append(' ' + tokens[x])
-                    x += 1
-                tokens2.append(' <span style="background-color: #90ee90">'
-                               + ' '.join(tokens[x:first])
-                               + '</span> ')
-            while (first < len(tokens)
-                   and re.match('\s+', tokens[first])):
-                tokens2.append(' ' + tokens[first])
-                first += 1
-            tokens2.append(' <span style="background-color: #87cefa">'
-                           + ' '.join(tokens[first:last])
-                           + '</span> ')
-            tokens2.append(' <span style="background-color: #90ee90">'
-                           + ' '.join(tokens[last:y])
-                           + '</span> ')
-            last = first
-            first = loc[1] + 1
-    tokens2.append(' '.join(tokens[first:len(tokens) - 1]))
-    tokens2 = normalize(''.join(tokens2)).replace('\n', '<br />')
-    return tokens2
+    tokens2 = []
+    outhtml = '<!DOCTYPE html><html><head></head><body>'
+    for index in tokList:
+       token = tokList[index]['value']
+       quoted = False
+       if index in quotedTextList:
+           quoted = quotedTextList[index]['value']
+       if quoted:
+           outhtml += \
+               '<span style="background-color: #90ee90">' \
+               + token + '</span>'
+       elif directspeech[int(index)]:
+           outhtml += \
+               '<span style="background-color: #87cefa">' \
+               + token + '</span>'
+       else:
+           outhtml += token
+    outhtml += '</body></html>'
+    return outhtml
 
 
 def prepareCompoundComplexDisplay(ccd,
@@ -418,8 +367,7 @@ def prepareToneDisplay(tone,
     countB5 = 0
     for i, token in enumerate(tokens):
         if posinfo[i] in ['PUNCT', 'SPACE', 'SYM'] \
-           or '\'' in tokens[i] \
-           or syl[i] is None:
+           or '\'' in tokens[i]:
             outhtml += tokens[i] + ' '
         elif tone[i] > 0.4:
             if threshold1:
@@ -1150,39 +1098,22 @@ def prepareSubjectivityDisplay(tokens, ps, sm, option2, option3):
     for i, token in enumerate(tokens):
         perspectives[i] = None
 
-    stancemarkers = tokens.copy()
+    print(sm)
+    stancemarkers = [False] * len(tokens)
+    stancelocs = [entry['startToken'] for entry in sm]
     for i, token in enumerate(tokens):
-        stancemarkers[i] = False
+        if i in stancelocs:
+            stancemarkers[i] = True
 
-    for domain in ps['implicit']:
-        if domain in sm['implicit']:
-            perspectives[int(domain)] = 'WRITER'
-            if domain in sm['implicit']:
-                for loc in sm['implicit'][domain]:
-                    stancemarkers[loc] = True
-            for loc in ps['implicit'][domain]:
-                perspectives[loc] = 'WRITER'
-        else:
-            for loc in ps['implicit'][domain]:
-                perspectives[loc] = 'OTHER'
-    for sub in ps['explicit_1']:
-        perspectives[sub] = 'WRITER'
-    for sub in sm['explicit_1']:
-        stancemarkers[sub] = True
-        perspectives[sub] = 'WRITER'
-    for sub in ps['explicit_2']:
-        perspectives[sub] = 'AUDIENCE'
-    for sub in sm['explicit_2']:
-        stancemarkers[sub] = True
-        perspectives[sub] = 'AUDIENCE'
-    for domain in ps['explicit_3']:
-        perspectives[int(domain)] = 'THIRDPERSON'
-        for item in ps['explicit_3'][domain]:
-            perspectives[item] = 'THIRDPERSON'
-        if domain in sm['explicit_3']:
-            for loc in sm['explicit_3'][domain]:
-                stancemarkers[loc] = True
-                perspectives[loc] = 'THIRDPERSON'
+    print(ps)
+    perspectives = ['WRITER'] * len(tokens)
+    for entry in ps:
+        index = int(entry['startToken'])
+        value = entry['value']
+        if type(value) == str:
+            perspectives[index] = value
+        elif type(value) == int:
+            perspectives[index] = 'THIRDPERSON'
 
     output = []
     for i, token in enumerate(tokens):
@@ -1195,7 +1126,7 @@ def prepareSubjectivityDisplay(tokens, ps, sm, option2, option3):
 
         elif '\n' in tokens[i]:
             output.append(tokens[i])
-        elif (perspectives[i] == 'WRITER'
+        elif (perspectives[i] in ['WRITER', 'SELF']
               and not stancemarkers[i]
               and option3 == 'Author\'s Perspective'):
 
@@ -1203,7 +1134,7 @@ def prepareSubjectivityDisplay(tokens, ps, sm, option2, option3):
                           + ' background-color: #ffffa1"> '
                           + tokens[i] + ' </span>')
 
-        elif (perspectives[i] == 'WRITER'
+        elif (perspectives[i] in ['WRITER', 'SELF']
               and option3 == 'Author\'s Perspective'):
 
             output.append('<span style="font-style: italic;'
@@ -1344,10 +1275,10 @@ for i, fname in enumerate(locs):
 document_labels = []
 if option0 == 'GRE Essays':
     for i in range(2, 7):
-        document_labels.append('Essay ' + str(i))
+        document_labels.append('GRE_Essay ' + str(i))
 elif option0 == 'Censorship Essays':
     for i in range(1, 26):
-        document_labels.append('Essay ' + str(i))
+        document_labels.append('Censorship_Essay ' + str(i))
 else:
     for i in range(1, 3):
         document_labels.append('Story ' + str(i))
@@ -1373,6 +1304,7 @@ option2 = st.selectbox('',
                         'Statements of Fact',
                         'Statements of Opinion',
                         'Argument Words',
+                        'Propositional Attitudes',
                         'Own vs. Other Perspectives',
                         'Characters',
                         'Emotion Words',
@@ -1460,6 +1392,7 @@ asyncio.set_event_loop(loop)
 
 # Send spell corrected text to the parser
 tokList = parser.send(['AWE_INFO', document_label, 'text', 'Token'])
+tok_with_wsList = parser.send(['AWE_INFO', document_label, 'text_with_ws', 'Token'])
 tokens = [entry['value'] for entry in tokList.values()]
 
 if tokens is None or len(tokens)==0:
@@ -1472,212 +1405,201 @@ if tokens is None or len(tokens)==0:
 numWords = parser.send(['AWE_INFO',
                         document_label,
                         'text', 'Token', 'total'])
-
-print('\nBasic info')
-print(numWords, ' words')
-
-lemmaList = parser.send(['AWE_INFO',
-                          document_label,
-                         'lemma_',
-                         'Token'])
-                         
-lemmas = [entry['value'] for entry in lemmaList.values()]
-
 numLemmas = parser.send(['AWE_INFO',
                          document_label,
                         'lemma_', 'Token', 'totaluniq'])
+numSentences = parser.send(['AWE_INFO',
+                           document_label,
+                           'sents', 'Doc', 'total'])
+numParas = parser.send(['AWE_INFO',
+                        document_label,
+                        'delimiter_\n',
+                        'Doc',
+                        'total'])
 
+print('\nBasic info')
+print(numWords, ' words')
 print(numLemmas, ' distinct words')
-if lemmas is None:
-    raise Exception("No lemmas recognized")
+print(numSentences, ' Sentences')
+print(numParas, ' paragraphs')
+
+
+cliList = parser.send(["AWE_INFO",
+                       document_label,
+                       "all_cluster_info",
+                       "Doc"])
+
+if cliList is None:
+    raise Exception("No information on word clusters retrieved")
+clDict = {}
+for entry in cliList.values():
+    clDict[entry['text']] = entry['value']
+clusters = pd.DataFrame.from_dict(clDict, orient='index')
+clusters.index.name = 'Cluster'
+clusters.columns = ['Count', 'Importance']
+print(clusters)
+
 
 rootList = parser.send(['AWE_INFO',
                           document_label,
                          'root',
                          'Token',
-                         '',
+                         'counts',
                          json.dumps([('is_space', ['False']),
                                      ('is_punct', ['False']),
                                      ('is_stop', ['False'])])])
-print(rootList)
-roots = sorted(set([entry['value'] for entry in rootList.values() if entry['value'] is not None]))
-print('Roots:', roots)
 
-sentenceList = parser.send(['AWE_INFO',
-                           document_label, 'sents', 'Doc'])
+roots = pd.DataFrame.from_dict(rootList, orient='index')
+roots.index.name = 'Root'
+roots.columns = ['Frequency']
+print(roots)
 
-sentences = [(sentence['startToken'],
-              sentence['endToken']+1) 
-              for sentence in sentenceList.values()]
+def proofreadOptions():
+    result = lt.processText(record, document_text)
+    if result is None:
+        raise Exception("No correction information received")
 
-if sentences is None:
-    raise Exception("No sentences recognized")
+    errorcounts = {}
+    detailcounts = {}
+    for item in result:
 
-numSentences = parser.send(['AWE_INFO',
-                           document_label,
-                           'sents', 'Doc', 'total'])
-print(numSentences, ' Sentences')
+        if item['label'] in errorcounts:
+            errorcounts[item['label']] += 1
+        else:
+            errorcounts[item['label']] = 1
 
+        if item['label'] + '/' + item['detail'] in detailcounts:
+            detailcounts[item['label'] + '/' + item['detail']] += 1
+        else:
+            detailcounts[item['label'] + '/' + item['detail']] = 1
 
-paragraphList = parser.send(['AWE_INFO',
-                           document_label,
-                           'delimiter_\n', 'Doc'])
-paragraphs = [(paragraph['startToken'],
-               paragraph['endToken']+1)
-              for paragraph in paragraphList.values()]
+    total = 0
+    for key in sorted(errorcounts.keys()):
+        total += errorcounts[key]
+    print('\nTotal grammar, usage, mechanics, style errors:', total)
 
-if paragraphs is None:
-    raise Exception("No paragraphs recognized")
-numParas = len(paragraphs)
-print(numParas, ' paragraphs')
+    print('\n-------Major error categories--------------------')
+    for key in sorted(errorcounts.keys()):
+        print(key, ':', errorcounts[key])
 
+    print('\n-------Minor error categories--------------------')
+    for key in sorted(detailcounts.keys()):
+        print(key, ':', detailcounts[key])
 
-result = lt.processText(record, document_text)
-if result is None:
-    raise Exception("No correction information received")
+    proofread = prepareCorrections(result, document_text)
+    return proofread
 
-errorcounts = {}
-detailcounts = {}
-for item in result:
+def POSOptions():
 
-    if item['label'] in errorcounts:
-        errorcounts[item['label']] += 1
-    else:
-        errorcounts[item['label']] = 1
+    print('\nPart of Speech Information')
 
-    if item['label'] + '/' + item['detail'] in detailcounts:
-        detailcounts[item['label'] + '/' + item['detail']] += 1
-    else:
-        detailcounts[item['label'] + '/' + item['detail']] = 1
+    posinfoList = parser.send(['AWE_INFO',
+                               document_label,
+                              'pos_',
+                              'Token',
+                              'counts'])
 
-total = 0
-for key in sorted(errorcounts.keys()):
-    total += errorcounts[key]
-print('\nTotal grammar, usage, mechanics, style errors:', total)
+    if posinfoList is None:
+        raise Exception(
+            "No part of speech information retrieved")
 
-print('\n-------Major error categories--------------------')
-for key in sorted(errorcounts.keys()):
-    print(key, ':', errorcounts[key])
+    for item in posinfoList:
+            print(item, posinfoList[item])
 
-print('\n-------Minor error categories--------------------')
-for key in sorted(detailcounts.keys()):
-    print(key, ':', detailcounts[key])
+    posinfoList2 = parser.send(['AWE_INFO',
+                                document_label,
+                                'pos_', 'Token'])
 
-proofread = prepareCorrections(result, document_text)
+    posinfo = [entry['value'] \
+        for entry in posinfoList2.values()]
 
-print('\nPart of Speech Information')
+    POSDisplay = preparePOSDisplayPage(
+        posinfo, option3, tokens)
+    return POSDisplay
 
-posinfoList = parser.send(['AWE_INFO',
+def informalOptions():
+    ilList = posinfoList2 = parser.send(['AWE_INFO',
+                                        document_label,
+                                        'vwp_interactive', 'Token'])
+
+    if ilList is None:
+        raise Exception("No information on interactive language retrieved")
+    il = []
+    for entry in ilList.values():
+        if entry['value']:
+            il.append(entry['tokenIdx'])
+
+    interactiveDisplay = prepareSimpleDisplay(il, tokens)
+
+    pctIL = posinfoList2 = parser.send(['AWE_INFO',
+                                       document_label,
+                                       'vwp_interactive', 'Token', 'percent'])
+
+    print('Percent Words Suggesting Informal Style: ', pctIL)
+    return interactiveDisplay
+
+def academicOptions():
+
+    academicList = parser.send(['AWE_INFO',
+                               document_label,
+                              'is_academic', 'Token'])
+    if academicList is None:
+        raise Exception("No academic language information retrieved")
+
+    academics = [entry['value'] for entry in academicList.values()]
+
+    academic_words = parser.send(['AWE_INFO',
+                                 document_label,
+                                 'is_academic', 'Token', 'uniq'])
+
+    latinateList = parser.send(['AWE_INFO',
+                               document_label,
+                               'is_latinate', 'Token'])
+
+    if latinateList is None:
+        raise Exception("No information on latinate words retrieved")
+    latinates = [False]*len(tokens)
+    for entry in latinateList.values():
+        if entry['value']:
+            latinates[entry['tokenIdx']] = True
+
+    countAcad = 0
+    for i, token in enumerate(tokens):
+        if academics[i] or latinates[i]:
+            countAcad += 1
+    academic_words, academicPage = \
+        prepareAcademicWordInfo(academics, latinates, tokens)
+
+    print('\nPercent Words Suggesting Academic Style: ',
+          round(countAcad * 1.0 / len(tokens) * 100))
+
+    print(len(academic_words),
+          ' distinct academic words used:',
+          academic_words)
+    return academicPage
+
+def frequencyOptions():
+
+    tf = parser.send(['AWE_INFO',
+                      document_label,
+                      'token_freq', 'Token', 'mean'])
+    print('Mean token freq:', tf)
+
+    posinfoList2 = parser.send(['AWE_INFO',
+                                document_label,
+                                'pos_', 'Token'])
+
+    posinfo = [entry['value'] \
+        for entry in posinfoList2.values()]
+
+    mfList = parser.send(['AWE_INFO',
                          document_label,
-                         'pos_', 'Token', 'counts'])
+                         'max_freq', 'Token'])
 
-print(posinfoList)
+    if mfList is None:
+        raise Exception("No information on maximum word frequencies")
+    mf = [entry['value'] for entry in mfList.values()]
 
-if posinfoList is None:
-    raise Exception("No part of speech information retrieved")
-
-for item in posinfoList:
-        print(item, posinfoList[item])
-
-posinfoList2 = parser.send(['AWE_INFO',
-                           document_label,
-                           'pos_', 'Token'])
-
-posinfo = [entry['value'] for entry in posinfoList2.values()]
-
-POSDisplay = preparePOSDisplayPage(posinfo, option3, tokens)
-
-print('\nVocabulary Information')
-
-ilList = posinfoList2 = parser.send(['AWE_INFO',
-                                    document_label,
-                                    'vwp_interactive', 'Token'])
-
-if ilList is None:
-    raise Exception("No information on interactive language retrieved")
-il = []
-for entry in ilList.values():
-    if entry['value']:
-        il.append(entry['tokenIdx'])
-
-interactiveDisplay = prepareSimpleDisplay(il, tokens)
-
-pctIL = posinfoList2 = parser.send(['AWE_INFO',
-                                   document_label,
-                                   'vwp_interactive', 'Token', 'percent'])
-
-print('Percent Words Suggesting Informal Style: ', pctIL)
-
-academicList = parser.send(['AWE_INFO',
-                           document_label,
-                           'is_academic', 'Token'])
-if academicList is None:
-    raise Exception("No academic language information retrieved")
-
-academics = [entry['value'] for entry in academicList.values()]
-
-academic_words = parser.send(['AWE_INFO',
-                             document_label,
-                             'is_academic', 'Token', 'uniq'])
-
-latinateList = parser.send(['AWE_INFO',
-                           document_label,
-                           'is_latinate', 'Token'])
-
-if latinateList is None:
-    raise Exception("No information on latinate words retrieved")
-latinates = [False]*len(tokens)
-for entry in latinateList.values():
-    if entry['value']:
-        latinates[entry['tokenIdx']] = True
-
-countAcad = 0
-for i, token in enumerate(tokens):
-    if academics[i] or latinates[i]:
-        countAcad += 1
-academic_words, academicPage = \
-    prepareAcademicWordInfo(academics, latinates, tokens)
-
-print('\nPercent Words Suggesting Academic Style: ',
-      round(countAcad * 1.0 / len(tokens) * 100))
-
-print(len(academic_words),
-      ' distinct academic words used:',
-      academic_words)
-
-tf = parser.send(['AWE_INFO',
-                  document_label,
-                  'token_freq', 'Token', 'mean'])
-print('Mean token freq:', tf)
-
-mfList = parser.send(['AWE_INFO',
-                     document_label,
-                     'max_freq', 'Token'])
-
-if mfList is None:
-    raise Exception("No information on maximum word"
-                    + " family frequencies")
-mf = [entry['value'] for entry in mfList.values()]
-
-freqDisplay, \
-    countB1, \
-    countB2, \
-    countB3, \
-    countB4, \
-    countB5, \
-    countB6, \
-    countB7 = prepareFrequencyDisplay(mf,
-                                      posinfo,
-                                      tokens,
-                                      False,
-                                      False,
-                                      False,
-                                      False,
-                                      False,
-                                      False,
-                                      False)
-
-if option2 == 'Word Frequency':
     freqDisplay, \
         countB1, \
         countB2, \
@@ -1697,65 +1619,74 @@ if option2 == 'Word Frequency':
                                 option9,
                                 option10)
 
-percentRare = round(countB7 / len(tokens) * 100)
+    percentRare = round(countB7 / len(tokens) * 100)
 
-percentVeryLowFrequency = \
-    round((countB6 + countB7) / len(tokens) * 100)
+    percentVeryLowFrequency = \
+        round((countB6 + countB7) / len(tokens) * 100)
 
-percentLowFrequency = round((countB5
-                            + countB6
-                            + countB7) / len(tokens) * 100)
+    percentLowFrequency = round((countB5
+                                + countB6
+                                + countB7) / len(tokens) * 100)
 
-percentMediumOrLowFrequency = \
-    round((countB4
-          + countB6
-          + countB7) / len(tokens) * 100)
+    percentMediumOrLowFrequency = \
+        round((countB4
+              + countB6
+              + countB7) / len(tokens) * 100)
 
-percentMediumHighFrequencyOrBelow = \
-    round((countB3
-           + countB4
-           + countB5
-           + countB6
-           + countB7) / len(tokens) * 100)
+    percentMediumHighFrequencyOrBelow = \
+        round((countB3
+               + countB4
+               + countB5
+               + countB6
+               + countB7) / len(tokens) * 100)
 
-percentHighFrequencyOrBelow = \
-    round((countB2
-           + countB3
-           + countB4
-           + countB5
-           + countB6
-           + countB7) / len(tokens) * 100)
+    percentHighFrequencyOrBelow = \
+        round((countB2
+               + countB3
+               + countB4
+               + countB5
+               + countB6
+               + countB7) / len(tokens) * 100)
 
-print('\nWord Frequencies')
+    print('\nWord Frequencies')
 
-print('Percent high frequency or below:',
-      percentHighFrequencyOrBelow)
+    print('Percent high frequency or below:',
+          percentHighFrequencyOrBelow)
 
-print('Percent medium high frequency or below:',
-      percentMediumHighFrequencyOrBelow)
+    print('Percent medium high frequency or below:',
+          percentMediumHighFrequencyOrBelow)
 
-print('Percent medium or low frequency:',
-      percentMediumOrLowFrequency)
+    print('Percent medium or low frequency:',
+          percentMediumOrLowFrequency)
 
-print('Percent low frequency:',
-      percentLowFrequency)
+    print('Percent low frequency:',
+          percentLowFrequency)
 
-print('Percent very low frequency:',
-      percentVeryLowFrequency)
+    print('Percent very low frequency:',
+          percentVeryLowFrequency)
 
-print('Percent extremely rare words:',
-      percentRare)
+    print('Percent extremely rare words:',
+          percentRare)
+    return freqDisplay
 
-sylList = parser.send(['AWE_INFO',
-                       document_label,
-                       'nSyll', 'Token'])
+def syllableOptions():
 
-if sylList is None:
-    raise Exception("No information on maximum word family frequencies")
-syl = [entry['value'] for entry in sylList.values()]
+    posinfoList2 = parser.send(['AWE_INFO',
+                                document_label,
+                                'pos_', 'Token'])
 
+    posinfo = [entry['value'] \
+        for entry in posinfoList2.values()]
 
-syllablePage = prepareSyllableDisplay(syl,
+    sylList = parser.send(['AWE_INFO',
+                           document_label,
+                           'nSyll', 'Token'])
+
+    if sylList is None:
+        raise Exception("No information on maximum word family frequencies")
+    syl = [entry['value'] for entry in sylList.values()]
+
+    syllablePage = prepareSyllableDisplay(syl,
                                       posinfo,
                                       tokens,
                                       False,
@@ -1763,7 +1694,6 @@ syllablePage = prepareSyllableDisplay(syl,
                                       False,
                                       False)
 
-if option2 == 'Number of Syllables':
     syllablePage, \
         countB1, \
         countB2, \
@@ -1776,39 +1706,35 @@ if option2 == 'Number of Syllables':
                                option5,
                                option6,
                                option7)
+    percentFourPlusSyls = \
+        round(countB1 * 1.0 / len(tokens) * 100)
+    percentThreePlusSyls = \
+        round((countB1 + countB2) * 1.0 / len(tokens) * 100)
+    percentTwoPlusSyls = \
+        round((countB1 + countB2 + countB3) * 1.0 / len(tokens) * 100)
 
-percentFourPlusSyls = \
-    round(countB1 * 1.0 / len(tokens) * 100)
-percentThreePlusSyls = \
-    round((countB1 + countB2) * 1.0 / len(tokens) * 100)
-percentTwoPlusSyls = \
-    round((countB1 + countB2 + countB3) * 1.0 / len(tokens) * 100)
+    print('\nNumber of Syllables')
+    print(percentFourPlusSyls, ' percent words with four or more syllables')
+    print(percentThreePlusSyls, ' percent words with three or more syllables')
+    print(percentTwoPlusSyls, ' percent words with two or more syllables')
+    return syllablePage
 
-print('\nNumber of Syllables')
-print(percentFourPlusSyls, ' percent words with four or more syllables')
-print(percentThreePlusSyls, ' percent words with three or more syllables')
-print(percentTwoPlusSyls, ' percent words with two or more syllables')
+def sentenceTypeOptions():
 
-stypeList = parser.send(['AWE_INFO',
-                        document_label,
-                        'sentence_types', 'Doc'])
-print(stypeList)
-stypes = [entry['value'] for entry in stypeList.values()]
-print(stypes)
-ccdPage = \
-    prepareCompoundComplexDisplay(stypes,
-                                  posinfo,
-                                  sentences,
-                                  tokens,
-                                  False,
-                                  False,
-                                  False,
-                                  False,
-                                  False,
-                                  False,
-                                  False)
+    sents = parser.send(["AWE_INFO",
+                         document_label,
+                         "sents",
+                         "Doc"])
 
-if option2 == 'Sentence Variety':
+    sentences = [[sents[idx]['startToken'], sents[idx]['endToken']] for idx in sents]
+
+    posinfoList2 = parser.send(['AWE_INFO',
+                                document_label,
+                                'pos_', 'Token'])
+
+    posinfo = [entry['value'] \
+        for entry in posinfoList2.values()]
+
     stypeList = parser.send(['AWE_INFO',
                             document_label,
                             'sentence_types', 'Doc'])
@@ -1827,577 +1753,405 @@ if option2 == 'Sentence Variety':
                                       option9,
                                       option10)
 
-print('\nSentence Variety:')
+    print('\nSentence Variety:')
 
+    stypeCount = parser.send(['AWE_INFO',
+                              document_label,
+                              'sentence_types', 'Doc', 'counts'])
 
-stypeCount = parser.send(['AWE_INFO',
-                        document_label,
-                        'sentence_types', 'Doc', 'counts'])
-                        
-for key in stypeCount.keys():
-    if key == 'Simple':
-        print('Number of simple (kernel) sentences: ',
-              stypeCount[key])
+    for key in stypeCount.keys():
+        if key == 'Simple':
+            print('Number of simple (kernel) sentences: ',
+                  stypeCount[key])
 
-    if key == 'SimpleComplexPred':
-        print('Number of simple sentences with complex predicates: ',
-              stypeCount[key])
+        if key == 'SimpleComplexPred':
+            print('Number of simple sentences with complex predicates: ',
+                  stypeCount[key])
 
-    if key == 'SimpleCompoundPred':
-        print('Number of simple sentences with compound predicates: ',
-              stypeCount[key])
+        if key == 'SimpleCompoundPred':
+            print('Number of simple sentences with compound predicates: ',
+                  stypeCount[key])
 
-    if key == 'SimpleCompoundComplexPred':
-        print('Number of simple sentences with compound/completx sentences: ',
-              stypeCount[key])
+        if key == 'SimpleCompoundComplexPred':
+            print('Number of simple sentences with compound/completx sentences: ',
+                  stypeCount[key])
 
-    if key == 'Complex':
-        print('Number of complex sentences: ',
-              stypeCount[key])
+        if key == 'Complex':
+            print('Number of complex sentences: ',
+                  stypeCount[key])
 
-    if key == 'Compound':
-        print('Number of compound sentences: ',
-              stypeCount[key])
+        if key == 'Compound':
+            print('Number of compound sentences: ',
+                  stypeCount[key])
 
-    if key == 'CompoundComplex':
-        print('Number of compound/complex sentences',
-              stypeCount[key])
+        if key == 'CompoundComplex':
+            print('Number of compound/complex sentences',
+                  stypeCount[key])
 
-#sumfeats = parser.send(['DOCSUMMARYFEATS',
-#                        document_label])
-#print('sumfeats', sumfeats)
+    return ccdPage
 
+def quoteCiteOptions():
+    print('\nQuotations:')
 
-transitionList = parser.send(['AWE_INFO',
-                             document_label,
-                             'transitions', 'Doc'])
+    quotedtextList = parser.send(["AWE_INFO",
+                                  document_label,
+                                  "vwp_quoted"])
+    if quotedtextList is None:
+        raise Exception("No quoted text information received")
+    quotedtext = [entry['value'] for entry in quotedtextList.values()]
 
-tlist = []
-for entry in transitionList.values():
-    category = entry['value']
-    sentStart = entry['startToken']
-    startToken = entry['startToken']
-    endToken = entry['endToken']
-    transition = entry['text']
-    tlist.append([transition, sentStart, startToken, endToken, category])
+    numQuotes = 0
+    quotedLast = False
+    for i, val in enumerate(quotedtext):
+        if val and not quotedLast:
+            numQuotes += 1
+            quotedLast = True
+        elif not val:
+            quotedLast = False
 
-numTransitions = parser.send(['AWE_INFO',
+    numQuotedWords = parser.send(['AWE_INFO',
+                                  document_label,
+                                  'vwp_quoted',
+                                  'Token',
+                                  'total',
+                                  json.dumps([('vwp_quoted',['True'])])])
+
+    print('\n', numQuotes, ' quotation(s)')
+    print(numQuotedWords, ' quoted words')
+
+    percentQuotedWords = \
+        round(1.0 * numQuotedWords / len(tokens) * 100)
+
+    print(percentQuotedWords,
+      ' percent quoted words')
+
+    attributionList = parser.send(["AWE_INFO",
+                                   document_label,
+                                   "vwp_attribution"])
+
+    if attributionList is None:
+        raise Exception("No attribution information received")
+    attributions = [entry['value'] for entry in attributionList.values()]
+
+    numAttributionWords = parser.send(['AWE_INFO',
+                                   document_label,
+                                   'vwp_attribution',
+                                   'Token',
+                                   'total',
+                                   json.dumps([('vwp_attribution',['True'])])])
+
+    attributedLast = False
+    numAttributions = 0
+    for i, val in enumerate(attributions):
+        if val and not attributedLast:
+            numAttributions += 1
+            attributedLast = True
+        elif not val:
+            attributedLast = False
+    print('\n', numAttributions, ' attributions')
+    print(numAttributionWords, ' attribution word(s)')
+
+    sourceList = parser.send(["AWE_INFO",
+                              document_label,
+                              "vwp_source"])
+    if sourceList is None:
+        raise Exception("No source information received")
+    sources = [entry['value'] for entry in sourceList.values()]
+    sourceLast = False
+    numSources = 0
+    for i, val in enumerate(sources):
+        if val and not sourceLast:
+            numSources += 1
+            sourceLast = True
+        elif not val:
+            sourceLast = False
+
+    numSourceWords = parser.send(["AWE_INFO",
+                                  document_label,
+                                  "vwp_source",
+                                  "Token",
+                                  "total",
+                                  json.dumps([('vwp_source',['True'])])])
+
+    print('\n', numSources, ' source(s)')
+    print(numSourceWords, ' source word(s)')
+
+    citedtextList = parser.send(["AWE_INFO",
+                                 document_label,
+                                 "vwp_cite"])
+
+    citedtext = [entry['value'] for entry in citedtextList.values()]
+
+    citedLast = False
+    numCites = 0
+    for i, val in enumerate(citedtext):
+        if val and not citedLast:
+            numCites += 1
+            citedLast = True
+        elif not val:
+            citedLast = False
+
+    if citedtext is None:
+        raise Exception("No citation information received")
+
+    numCitedWords = parser.send(["AWE_INFO",
+                                 document_label,
+                                 "vwp_cite",
+                                 "Token",
+                                 "total",
+                                 json.dumps([('vwp_cite',['True'])])])
+
+    print('\n', numCites, ' citation(s)')
+    print(numCitedWords, ' cited words(s)')
+
+    quoteCite = prepareQuoteCite(quotedtext,
+                                 attributions,
+                                 sources,
+                                 citedtext)
+    return quoteCite
+
+def statements_of_opinionOptions():
+    ofList = parser.send(['AWE_INFO',
+                          document_label,
+                          'vwp_statements_of_opinion',
+                          'Doc'])
+
+    of = [[entry['startToken'], entry['endToken']+1] for entry in ofList.values()]
+
+    opinionStatements = prepareRangeMarking(tokens, of)
+    return opinionStatements
+
+def statements_of_factOptions():
+    sfList = parser.send(['AWE_INFO',
+                          document_label,
+                          'vwp_statements_of_fact',
+                          'Doc'])
+    sf = [[entry['startToken'], entry['endToken']+1] for entry in sfList.values()]
+
+    factualStatements = prepareRangeMarking(tokens, sf)
+    return factualStatements
+
+def dialogueOptions():
+    tok_with_wsList = parser.send(['AWE_INFO',
+                                   document_label,
+                                   'text_with_ws',
+                                   'Token'])
+
+    dsList = parser.send(["AWE_INFO",
+                         document_label,
+                         "vwp_direct_speech_spans",
+                         "Doc"])
+    quotedtextList = parser.send(["AWE_INFO",
+                                  document_label,
+                                  "vwp_quoted"])
+    if quotedtextList is None:
+        raise Exception("No quoted text information received")
+    quotedtext = [entry['value'] for entry in quotedtextList.values()]
+
+    dialogueDisplay = \
+        displayDialogue(tok_with_wsList,
+                        quotedtextList,
+                        dsList)
+
+    print('\nQuotations:')
+
+    numQuotes = 0
+    quotedLast = False
+    for i, val in enumerate(quotedtext):
+        if val and not quotedLast:
+            numQuotes += 1
+            quotedLast = True
+        elif not val:
+            quotedLast = False
+
+    numQuotedWords = parser.send(['AWE_INFO',
+                                  document_label,
+                                  'vwp_quoted',
+                                  'Token',
+                                  'total',
+                                  json.dumps([('vwp_quoted',['True'])])])
+
+    print('\n', numQuotes, ' quotation(s)')
+    print(numQuotedWords, ' quoted words')
+
+    percentQuotedWords = \
+        round(1.0 * numQuotedWords / len(tokens) * 100)
+
+    print(percentQuotedWords,
+      ' percent quoted words')
+
+    return dialogueDisplay
+
+def sceneSettingOptions():
+    transitionList = parser.send(['AWE_INFO',
+                                  document_label,
+                                  'transitions', 'Doc'])
+
+    tlist = []
+    for entry in transitionList.values():
+        category = entry['value']
+        sentStart = entry['startToken']
+        startToken = entry['startToken']
+        endToken = entry['endToken']
+        transition = entry['text']
+        tlist.append([transition, sentStart, startToken, endToken, category])
+    
+    numTransitions = parser.send(['AWE_INFO',
                              document_label,
                              'transitions', 'Doc', 'total'])
 
-transitionTypeProfile = parser.send(['AWE_INFO',
+    transitionTypeProfile = parser.send(['AWE_INFO',
                                    document_label,
                                    'transitions', 'Doc', 'counts'])
-print('\nType Frequency')
-for item in transitionTypeProfile:
+    print('\nType Frequency')
+    for item in transitionTypeProfile:
+       print(item, transitionTypeProfile[item])
+
+    print('Number of transition words and phrases:', numTransitions)
+
+    transitionProfile = parser.send(["AWE_INFO",
+                                    document_label,
+                                    "transitions",
+                                    "Doc",
+                                    "counts",
+                                    json.dumps([]),
+                                    json.dumps(["text"])])
+
+    if transitionProfile is None:
+        raise Exception("No information on transition words retrieved")
+
+    print('\nTransition Words and Phrases:')
+    tp = [numTransitions, transitionTypeProfile, transitionProfile, tlist]
+
+    transition_categoriesList = parser.send(['AWE_INFO',
+                                 document_label,
+                                 'transition_category', 'Token'])
+
+    in_direct_speechList = parser.send(['AWE_INFO',
+                                        document_label,
+                                        'vwp_in_direct_speech', 'Token'])
+
+    in_past_tense_scopeList = parser.send(['AWE_INFO',
+                                           document_label,
+                                           'in_past_tense_scope', 'Token'])
+
+    locList = parser.send(['AWE_INFO',
+                      document_label,
+                     'location', 'Token'])
+
+    sceneSetting, numComments = \
+        prepareSceneDisplay(ctext,
+                            tok_with_wsList,
+                            transition_categoriesList,
+                            in_direct_speechList,
+                            in_past_tense_scopeList,
+                            locList)
+
+    temporalCount = 0
+    for item in tp[3]:
+        if item[4] == 'temporal':
+            temporalCount += 1
+
+    locCount = 0
+    for i, val in enumerate(locs):
+        if val:
+            locCount += 1
+
+    sceneWordPercent = \
+        round((temporalCount + locCount) * 1.0 / len(tokens) * 100)
+
+    print(sceneWordPercent,
+          ' percent words suggesting scene description')
+
+    print(numComments,
+          ' number of shifts into present tense suggesting a comment')
+    return sceneSetting
+
+def transitionOptions():
+
+    print('Transition word and phrase information')
+
+    transitionList = parser.send(['AWE_INFO',
+                                 document_label,
+                                 'transitions', 'Doc'])
+
+    tlist = []
+    for entry in transitionList.values():
+        category = entry['value']
+        sentStart = entry['startToken']
+        startToken = entry['startToken']
+        endToken = entry['endToken']
+        transition = entry['text']
+        tlist.append([transition, sentStart, startToken, endToken, category])
+
+    numTransitions = parser.send(['AWE_INFO',
+                                 document_label,
+                                 'transitions', 'Doc', 'total'])
+
+    transitionTypeProfile = parser.send(['AWE_INFO',
+                                       document_label,
+                                       'transitions', 'Doc', 'counts'])
+    print('\nTransition Category Frequency')
+    for item in transitionTypeProfile:
         print(item, transitionTypeProfile[item])
 
+    print('Number of transition words and phrases:', numTransitions)
 
-print('Number of transition words and phrases:', numTransitions)
-
-
-transitionProfile = parser.send(["AWE_INFO",
-                                document_label,
-                                "transitions",
-                                "Doc",
-                                "counts",
-                                json.dumps([]),
-                                json.dumps(["text"])])
-print('\nType Frequency')
-for item in transitionProfile:
+    transitionProfile = parser.send(["AWE_INFO",
+                                    document_label,
+                                    "transitions",
+                                    "Doc",
+                                    "counts",
+                                    json.dumps([]),
+                                    json.dumps(["text"])])
+    print('\nType Frequency')
+    for item in transitionProfile:
         print(item.replace('\n','PARA'), transitionProfile[item])
 
+    tp = [numTransitions, transitionTypeProfile, transitionProfile, tlist]
 
-print('\nTransition Words and Phrases:')
-tp = [numTransitions, transitionTypeProfile, transitionProfile, tlist]
+    if tp is None:
+        raise Exception("No information on transition words retrieved")
+    prepcs = None
+    transitionDisplay = prepareTransitionMarking(tokens, tp, prepcs)
+    return transitionDisplay
 
-if tp is None:
-    raise Exception("No information on transition words retrieved")
-prepcs = None
-transitions = prepareTransitionMarking(tokens, tp, prepcs)
+def toneOptions():
 
-print('\nQuotes, Citations, Attributions:')
-
-quotedtextList = parser.send(["AWE_INFO",
+    polarityList = parser.send(["AWE_INFO",
                                 document_label,
-                                "vwp_quoted"])
-quotedtext = [entry['value'] for entry in quotedtextList.values()]
-if quotedtext is None:
-    raise Exception("No quoted text information received")
+                                "polarity"])
+    pl = [entry['text'] for entry \
+        in polarityList.values() if entry['value']>0]
+    print('polarity words:', pl)
 
-numQuotes = 0
-quotedLast = False
-for i, val in enumerate(quotedtext):
-    if val and not quotedLast:
-        numQuotes += 1
-        quotedLast = True
-    elif not val:
-        quotedLast = False
+    toneList = parser.send(["AWE_INFO",
+                            document_label,
+                            "vwp_tone"])
 
-numQuotedWords = parser.send(['AWE_INFO',
-                                document_label,
-                                'vwp_quoted',
-                                'Token',
-                                'total',
-                                json.dumps([('vwp_quoted',['True'])])])
+    tone = [entry['value'] for entry in toneList.values()]
 
-print('\n', numQuotes, ' quotation(s)')
-print(numQuotedWords, ' quoted words')
+    stopwords = parser.send(["AWE_INFO",
+                            document_label,
+                            "is_stop"])
 
-attributionList = parser.send(["AWE_INFO",
-                                document_label,
-                                "vwp_attribution"])
-if attributionList is None:
-    raise Exception("No attribution information received")
-attributions = [entry['value'] for entry in attributionList.values()]
-
-numAttributionWords = parser.send(['AWE_INFO',
+    posinfoList = parser.send(['AWE_INFO',
                                document_label,
-                               'vwp_attribution',
-                               'Token',
-                               'total',
-                               json.dumps([('vwp_attribution',['True'])])])
-
-attributedLast = False
-numAttributions = 0
-for i, val in enumerate(attributions):
-    if val and not attributedLast:
-        numAttributions += 1
-        attributedLast = True
-    elif not val:
-        attributedLast = False
-print('\n', numAttributions, ' attributions')
-print(numAttributionWords, ' attribution word(s)')
-
-sourceList = parser.send(["AWE_INFO",
-                          document_label,
-                          "vwp_source"])
-if sourceList is None:
-    raise Exception("No source information received")
-sources = [entry['value'] for entry in sourceList.values()]
-sourceLast = False
-numSources = 0
-for i, val in enumerate(sources):
-    if val and not sourceLast:
-        numSources += 1
-        sourceLast = True
-    elif not val:
-        sourceLast = False
-
-numSourceWords = parser.send(["AWE_INFO",
-                              document_label,
-                              "vwp_source",
-                              "Token",
-                              "total",
-                              json.dumps([('vwp_source',['True'])])])
-
-print('\n', numSources, ' source(s)')
-print(numSourceWords, ' source word(s)')
-
-citedtextList = parser.send(["AWE_INFO",
-                          document_label,
-                          "vwp_cite"])
-
-citedtext = [entry['value'] for entry in citedtextList.values()]
-
-citedLast = False
-numCites = 0
-for i, val in enumerate(citedtext):
-    if val and not citedLast:
-        numCites += 1
-        citedLast = True
-    elif not val:
-        citedLast = False
-
-if citedtext is None:
-    raise Exception("No citation information received")
-
-numCitedWords = parser.send(["AWE_INFO",
-                              document_label,
-                              "vwp_cite",
-                              "Token",
-                              "total",
-                              json.dumps([('vwp_cite',['True'])])])
-
-print('\n', numCites, ' citation(s)')
-print(numCitedWords, ' cited words(s)')
-
-quoteCite = prepareQuoteCite(quotedtext,
-                             attributions,
-                             sources,
-                             citedtext)
-
-print('\nArgument Language:')
-
-argew = parser.send(["AWE_INFO",
-                     document_label,
-                     "vwp_explicit_argument"])
-
-if argew is None:
-    raise Exception("No information on explicit argument words retrieved")
-eaw = [entry['tokenIdx'] for entry in argew.values() if entry['value']]
-
-print('explicit argument words', [entry['text'] for entry in argew.values() if entry['value']])
-
-argw = parser.send(["AWE_INFO",
-                     document_label,
-                     "vwp_argumentword"])
-
-print('argument words', [entry['text'] for entry in argw.values() if entry['value']])
-
-awList = parser.send(["AWE_INFO",
-                     document_label,
-                     "vwp_argumentation"])
-if awList is None:
-    raise Exception("No information on argument words retrieved")
-aw = [entry['tokenIdx'] for entry in awList.values() if entry['value']]
-
-percentArgumentLanguage = \
-    parser.send(["AWE_INFO",
-                 document_label,
-                 "vwp_argumentation",
-                 "Token",
-                 "percent",
-                 json.dumps([('vwp_argumentation',['True'])])])
-
-print(percentArgumentLanguage, ' percent argument language in text')
-
-cliList = parser.send(["AWE_INFO",
-                       document_label,
-                       "all_cluster_info",
-                       "Doc"])
-if cliList is None:
-    raise Exception("No information on word clusters retrieved")
-clDict = {}
-for entry in cliList.values():
-    clDict[entry['text']] = entry['value']
-for cluster in clDict:
-    print(json.loads(cluster), 'Count:', clDict[cluster][0], 'Importance:', clDict[cluster][1])
-
-csList = parser.send(["AWE_INFO",
-                       document_label,
-                       "supporting_ideas",
-                       "Doc"])
-
-if csList is None:
-    raise Exception("No information on supporting detail segments retrieved")
-cs = [[entry['startToken'], entry['endToken']+1] for entry in csList.values()]
-
-pl = parser.send(['PROMPTLANGUAGE', document_label])
-if pl is None:
-    raise Exception("No information on main idea words retrieved")
-print(pl)
-
-pr = parser.send(['PROMPTRELATED', document_label])
-print(pr)
-if tp is None:
-    raise Exception("No information on related main idea words retrieved")
-
-coreList = parser.send(["AWE_INFO",
-                        document_label,
-                        "main_ideas",
-                        "Doc"])
-if coreList is None:
-    raise Exception("No information on main ideas retrieved")
-core = [[entry['startToken'], entry['endToken']+1] for entry in coreList.values()]
-print('core', core)
-
-
-ps = parser.send(['PERSPECTIVESPANS', document_label])
-if ps is None:
-    raise Exception("No information on perspective spans retrieved")
-
-sm = parser.send(['STANCEMARKERS', document_label])
-
-if sm is None:
-    raise Exception("No information on stance markers retrieved")
-
-pa = parser.send(["AWE_INFO",
-                   document_label,
-                   "vwp_propositional_attitudes",
-                   "Doc"])
-if pa is None:
-    raise Exception("No information on propositional"
-                    + " attitudes retrieved")
-
-print('Propositional attitudes:')
-pa_display = [entry['value'] + '\t' + entry['text'] for entry in pa.values()]
-for prop in pa_display:
-    print(prop)
-cw = []
-
-percentCore = round(len(core) * 1.0 / len(sentences) * 100)
-print(percentCore,
-      ' percent of sentences seem to express the thesis'
-      + ' and main points of an essay')
-
-percentSupporting = \
-    round(len(cs) * 1.0 / len(sentences) * 100)
-
-print(percentSupporting,
-      ' percent of sentences seem to express supporting points')
-
-percentDetail = round(len(cs) * 1.0 / len(sentences) * 100)
-
-print(percentSupporting,
-      ' percent of sentences seem to provide details'
-      + ' elaborating on the main points')
-
-details, argumentwords = \
-    prepareArgumentWordMarking(tokens, lemmas, aw,
-                               eaw, pl, pr, cw, cs)
-
-supportingideas = prepareSupportingIdeas(cs)
-
-essaystructure, argumentwords = \
-    prepareArgumentWordMarking(tokens,
-                               lemmas,
-                               aw, eaw, pl, pr, cw, core)
-subjectivities, \
-    perspectives, \
-    stancemarkers = \
-    prepareSubjectivityDisplay(tokens,
-                               ps, sm, option2, option3)
-
-percentAllocentric = \
-    round(len([item for item in perspectives
-               if item == 'OTHER']) * 1.0 / len(tokens) * 100)
-
-print(percentAllocentric,
-      ' percent of words in sentences expressing'
-      + ' a third party\'s point of view')
-
-print('\nNarrative Language:')
-
-emList = parser.send(["AWE_INFO",
-                   document_label,
-                   "vwp_emotionword"])
-
-if emList is None:
-    raise Exception("No information on emotion words retrieved")
-em = [entry['value'] for entry in emList.values()]
-
-emotionDisplay = prepareEmotionDisplay(em, tokens)
-
-percentEmotion = \
-    round(1.0 * len([item for item in em
-                     if item is True]) / len(tokens) * 100)
-
-print('Percent emotion words: ', percentEmotion)
-
-ctList = parser.send(["AWE_INFO",
-                   document_label,
-                   "vwp_character"])
-if ctList is None:
-    raise Exception("No information on character' \
-                    + ' trait words retrieved")
-ct = [entry['value'] for entry in ctList.values()]
-
-traitDisplay = prepareEmotionDisplay(ct, tokens)
-
-percentCharacter = \
-    round(1.0 * len([item for item in ct
-                     if item is True]) / len(tokens) * 100)
-
-print('Percent character trait words: ',
-      percentCharacter)
-
-# emotions = parser.send(['EMOTIONALSTATES',
-#                        document_label])
-# em = flattenViewpointList(emotions, tokens)
-# emotionDisplay = prepareEmotionDisplay(em, tokens)
-
-# traits = parser.send(['CHARACTERTRAITS',
-#                      document_label])
-# ct = flattenViewpointList(traits, tokens)
-# traitDisplay = prepareEmotionDisplay(ct, tokens)
-
-dsList = parser.send(["AWE_INFO",
-                  document_label,
-                  "direct_speech_spans",
-                  "Doc"])
-directspeech = []
-if dsList is not None:
-    for item in dsList.values():
-        speaker = item['value'][0]
-        addressee = item['value'][1]
-        left = item['startToken']
-        right = item['endToken']
-        directspeech.append([speaker, addressee, [[left, right]]])
-countDirect = 0
-for item in directspeech:
-    for span in item[2]:
-        countDirect += 1 + span[1] - span[0]
-
-percentDialogueIndicator = \
-    round(1.0 * countDirect / len(tokens) * 100)
-
-print('Percent words suggesting dialogue: ',
-      percentDialogueIndicator)
-
-percentQuotedWords = \
-    round(1.0 * numQuotedWords / len(tokens) * 100)
-
-print(percentQuotedWords,
-      ' percent quoted words')
-
-dialogueDisplay = displayDialogue(tokens,
-                                  quotedtext,
-                                  directspeech)
-
-in_direct_speechList = parser.send(["AWE_INFO",
-                                document_label,
-                                "vwp_in_direct_speech"])
-in_direct_speech = [entry['value'] \
-        for entry \
-        in in_direct_speechList.values()]
-
-tensechanges = parser.send(['TENSECHANGES',
-                           document_label])
-
-locList = parser.send(["AWE_INFO",
-                     document_label,
-                     "location"])
-locs = [location['value'] \
-        for location \
-        in locList.values()]
-
-sceneSetting, numComments = \
-    prepareSceneDisplay(tokens,
-                        tp[3],
-                        in_direct_speech,
-                        tensechanges,
-                        locs)
-
-temporalCount = 0
-for item in tp[3]:
-    if item[4] == 'temporal':
-        temporalCount += 1
-
-locCount = 0
-for i, val in enumerate(locs):
-    if val:
-        locCount += 1
-
-sceneWordPercent = \
-    round((temporalCount + locCount) * 1.0 / len(tokens) * 100)
-
-print(sceneWordPercent,
-      ' percent words suggesting scene description')
-
-print(numComments,
-      ' number of shifts into present tense suggesting a comment')
-
-social_awarenessList = parser.send(["AWE_INFO",
-                                    document_label,
-                                    "vwp_social_awareness",
-                                    "Doc"])
-
-social_awareness = [[entry['startToken'], entry['endToken']]
-                   for entry in social_awarenessList.values()]
-
-socialAwarenessPage = \
-    prepareRangeMarking(tokens, social_awareness)
-
-numTheoryOfMindSentences = len(social_awareness)
-
-numTOMWords = 0
-
-for item in social_awareness:
-    numTOMWords = item[1] - item[0]
-
-percentTheoryOfMindText = \
-    round(numTOMWords * 1.0 / len(tokens) * 100)
-
-print(numTheoryOfMindSentences,
-      ' sentences expressing social awareness of'
-      + ' other people\'s points of view')
-
-print(percentTheoryOfMindText,
-      ' percent words expressing social awareness'
-      + ' of other people\'s points of view')
-
-concretedetailsList = parser.send(["AWE_INFO",
-                        document_label,
-                        "concrete_detail"])
-concretedetails = [entry['tokenIdx'] \
-                   for entry \
-                   in concretedetailsList.values()
-                   if entry['value']]
-
-concreteDetailPage = \
-    prepareConcreteDetailDisplay(tokens, concretedetails)
-
-percentConcreteDetail = \
-    round(1.0 * len(concretedetails) / len(tokens) * 100)
-
-print(percentConcreteDetail,
-      ' percent concrete detail words')
-
-[characters,
- otherRefs] = parser.send(['NOMINALREFERENCES',
-                          document_label])
-
-characterPage = prepareCharacterDisplay(characters, tokens)
-firstPersonRefs = 0
-numCharsMultiRef = 0
-references = []
-for key in characters:
-    if key == 'SELF':
-        firstPersonRefs += 1
-    elif len(characters[key]) > 1:
-        numCharsMultiRef += 1
-        references.append(key)
-
-print(numCharsMultiRef,
-      ' characters referenced more than once '
-      + '(repeated references to the same name or descriptive noun)')
-
-print('List of references to people or characters:',
-      sorted(references))
-
-polarityList = parser.send(["AWE_INFO",
-                        document_label,
-                        "polarity"])
-pl = [entry['text'] for entry in polarityList.values() if entry['value']>0]
-print('polarity words:', pl)
-
-toneList = parser.send(["AWE_INFO",
-                        document_label,
-                        "vwp_tone"])
-
-tone = [entry['value'] for entry in toneList.values()]
-
-stopwords = parser.send(["AWE_INFO",
-                        document_label,
-                        "is_stop"])
-
-filteredtone = []
-for i, value in enumerate(tone):
-    if str(i) not in stopwords:
-        filteredtone.append(value)
-    else:
-        if not stopwords[str(i)]['value']:
+                              'pos_',
+                              'Token'])
+    posinfo = [entry['value'] \
+        for entry in posinfoList.values()]
+
+    filteredtone = []
+    for i, value in enumerate(tone):
+        if str(i) not in stopwords:
             filteredtone.append(value)
         else:
-            filteredtone.append(0.0)
+            if not stopwords[str(i)]['value']:
+                filteredtone.append(value)
+            else:
+                filteredtone.append(0.0)
 
-tonePage, \
-    countStrongPositive, \
-    countWeakPositive, \
-    countNeutral, \
-    countWeakNegative, \
-    countStrongNegative = \
-    prepareToneDisplay(filteredtone,
-                       posinfo,
-                       tokens,
-                       False,
-                       False,
-                       False,
-                       False,
-                       False)
-
-if option2 == 'Tone':
     tonePage, \
         countStrongPositive, \
         countWeakPositive, \
@@ -2413,90 +2167,404 @@ if option2 == 'Tone':
                            option7,
                            option8)
 
-percentStrongPositive = \
-    round(1.0 * countStrongPositive / len(tokens) * 100)
+    percentStrongPositive = \
+        round(1.0 * countStrongPositive / len(tokens) * 100)
 
-percentWeakPositive = \
-    round(1.0 * countWeakPositive/len(tokens) * 100)
+    percentWeakPositive = \
+        round(1.0 * countWeakPositive/len(tokens) * 100)
 
-percentNeutral = \
-    round(1.0 * countNeutral / len(tokens) * 100)
+    percentNeutral = \
+        round(1.0 * countNeutral / len(tokens) * 100)
 
-percentWeakNegative = \
-    round(1.0 * countWeakNegative / len(tokens) * 100)
+    percentWeakNegative = \
+        round(1.0 * countWeakNegative / len(tokens) * 100)
 
-percentStrongNegative = \
-    round(1.0 * countStrongNegative / len(tokens) * 100)
+    percentStrongNegative = \
+        round(1.0 * countStrongNegative / len(tokens) * 100)
 
-print('\nTone:')
-print(percentStrongPositive, ' percent with strong positive connotations')
-print(percentWeakPositive, ' percent with weak positive connotations')
-print(percentNeutral, ' percent with neutral connotations')
-print(percentWeakNegative, ' percent with weak negative connotations')
-print(percentStrongNegative, ' percent with strong negative connotations')
+    print('\nTone:')
+    print(percentStrongPositive, ' percent with strong positive connotations')
+    print(percentWeakPositive, ' percent with weak positive connotations')
+    print(percentNeutral, ' percent with neutral connotations')
+    print(percentWeakNegative, ' percent with weak negative connotations')
+    print(percentStrongNegative, ' percent with strong negative connotations')
 
-sfList = parser.send(['AWE_INFO',
+    return tonePage
+
+def socialAwarenessOptions():
+
+    social_awarenessList = parser.send(["AWE_INFO",
+                                        document_label,
+                                        "vwp_social_awareness",
+                                        "Doc"])
+
+    social_awareness = [[entry['startToken'], entry['endToken']]
+                       for entry in social_awarenessList.values()]
+
+    tokList = parser.send(['AWE_INFO', document_label, 'text', 'Token'])
+    tokens = [entry['value'] for entry in tokList.values()]
+    socialAwarenessPage = \
+        prepareRangeMarking(tokens, social_awareness)
+
+    numTheoryOfMindSentences = len(social_awareness)
+
+    numTOMWords = 0
+
+    for item in social_awareness:
+        numTOMWords = item[1] - item[0]
+
+    percentTheoryOfMindText = \
+        round(numTOMWords * 1.0 / len(tokens) * 100)
+
+    print(numTheoryOfMindSentences,
+          ' sentences expressing social awareness of'
+          + ' other people\'s points of view')
+
+    print(percentTheoryOfMindText,
+          ' percent words expressing social awareness'
+          + ' of other people\'s points of view')
+    return socialAwarenessPage
+
+def concreteDetailOptions():
+    tokList = parser.send(['AWE_INFO', document_label, 'text', 'Token'])
+    tokens = [entry['value'] for entry in tokList.values()]
+
+    concretedetailsList = parser.send(["AWE_INFO",
+                        document_label,
+                        "concrete_detail"])
+    concretedetails = [entry['tokenIdx'] \
+                       for entry \
+                       in concretedetailsList.values()
+                       if entry['value']]
+
+    concreteDetailPage = \
+        prepareConcreteDetailDisplay(tokens, concretedetails)
+
+    percentConcreteDetail = \
+        round(1.0 * len(concretedetails) / len(tokens) * 100)
+
+    print(percentConcreteDetail,
+          ' percent concrete detail words')
+
+    return concreteDetailPage
+
+def emotionOptions():
+    emotions = parser.send(["AWE_INFO",
+                            document_label,
+                            "vwp_emotion_states",
+                            "Doc"])
+    em = [False]*len(tokens)
+    for entry in emotions.values():
+        em[entry['startToken']] = True
+    emotionDisplay = prepareEmotionDisplay(em, tokens)
+    percentEmotion = \
+        round(1.0 * len([item for item in em
+                         if item is True]) / len(tokens) * 100)
+
+    print('Percent emotion words: ', percentEmotion)
+
+
+    return emotionDisplay
+
+def characterOptions():
+    [characters,
+     otherRefs] = parser.send(['NOMINALREFERENCES',
+                               document_label])
+
+    print(characters)
+
+    characterPage = prepareCharacterDisplay(characters, tokens)
+    firstPersonRefs = 0
+    numCharsMultiRef = 0
+    references = []
+    for key in characters:
+        if key == 'SELF':
+            firstPersonRefs += 1
+        elif len(characters[key]) > 1:
+            numCharsMultiRef += 1
+            references.append(key)
+
+    print(numCharsMultiRef,
+          ' characters referenced more than once '
+          + '(repeated references to the same name or descriptive noun)')
+
+    print('List of references to people or characters:',
+          sorted(references))
+    return characterPage
+
+def traitOptions():
+    traitList = parser.send(["AWE_INFO",
+                             document_label,
+                            "vwp_character_traits",
+                            "Doc"])
+    traits = [False]*len(tokens)
+    for entry in traitList.values():
+        traits[entry['startToken']] = True
+    traitDisplay = prepareEmotionDisplay(traits, tokens)
+    return traitDisplay
+
+def subjectivityOptions(option2, option3):
+    ps = parser.send(['PERSPECTIVESPANS', document_label])
+    if ps is None:
+        raise Exception("No information on perspective spans retrieved")
+
+    sm = parser.send(['STANCEMARKERS', document_label])
+
+    if sm is None:
+        raise Exception("No information on stance markers retrieved")
+
+    subjectivities, \
+        perspectives, \
+        stancemarkers = \
+        prepareSubjectivityDisplay(tokens,
+                                   ps, sm, option2, option3)
+
+    percentAllocentric = \
+        round(len([item for item in perspectives
+                   if item == 'OTHER']) * 1.0 / len(tokens) * 100)
+
+    print(percentAllocentric,
+          ' percent of words in sentences expressing'
+          + ' a third party\'s point of view')
+
+    percentEgocentric = \
+        round(len([item for item in perspectives
+                   if item == 'SELF']) * 1.0 / len(tokens) * 100)
+    print(percentEgocentric,
+          ' percent of words in sentences expressing'
+          + 'the writer\'s point of view')
+
+    return subjectivities
+
+def argumentWordOptions():
+    print('\nArgument Language:')
+
+
+    lemmaList = parser.send(['AWE_INFO',
+                             document_label,
+                             'lemma_', 'Token'])
+    lemmas = [entry['text'] for entry in lemmaList.values()]
+    argew = parser.send(["AWE_INFO",
+                         document_label,
+                         "vwp_explicit_argument"])
+
+    if argew is None:
+        raise Exception("No information on explicit argument words retrieved")
+    eaw = [entry['tokenIdx'] for entry in argew.values() if entry['value']]
+
+    print('explicit argument words', [entry['text'] for entry in argew.values() if entry['value']])
+
+    argw = parser.send(["AWE_INFO",
+                        document_label,
+                        "vwp_argumentword"])
+
+    print('argument words', [entry['text'] for entry in argw.values() if entry['value']])
+
+    awList = parser.send(["AWE_INFO",
+                          document_label,
+                          "vwp_argumentation"])
+    if awList is None:
+        raise Exception("No information on argument words retrieved")
+    aw = [entry['tokenIdx'] for entry in awList.values() if entry['value']]
+
+    percentArgumentLanguage = \
+        parser.send(["AWE_INFO",
+                     document_label,
+                     "vwp_argumentation",
+                     "Token",
+                     "percent",
+                     json.dumps([('vwp_argumentation',['True'])])])
+
+    print(percentArgumentLanguage, ' percent argument language in text')
+
+    csList = parser.send(["AWE_INFO",
+                           document_label,
+                           "supporting_ideas",
+                           "Doc"])
+
+    if csList is None:
+        raise Exception("No information on supporting detail segments retrieved")
+    cs = [[entry['startToken'], entry['endToken']+1] for entry in csList.values()]
+
+    pl = parser.send(['PROMPTLANGUAGE', document_label])
+    if pl is None:
+        raise Exception("No information on main idea words retrieved")
+
+    pr = parser.send(['PROMPTRELATED', document_label])
+    if pr is None:
+       raise Exception("No information on related main idea words retrieved")
+
+    coreList = parser.send(["AWE_INFO",
+                            document_label,
+                            "main_ideas",
+                            "Doc"])
+    if coreList is None:
+        raise Exception("No information on main ideas retrieved")
+    core = [[entry['startToken'], entry['endToken']+1] for entry in coreList.values()]
+
+    cw = []
+    essaystructure, argumentwords = \
+        prepareArgumentWordMarking(tokens,
+                                   lemmas,
+                                   aw, eaw, pl, pr, cw, core)
+    return argumentwords
+
+def mainIdeaOptions():
+    coreList = parser.send(["AWE_INFO",
+                            document_label,
+                            "main_ideas",
+                            "Doc"])
+    if coreList is None:
+        raise Exception("No information on main ideas retrieved")
+    core = [[entry['startToken'], entry['endToken']+1] for entry in coreList.values()]
+
+    sents = parser.send(["AWE_INFO",
+                         document_label,
+                         "sents",
+                         "Doc"])
+
+    percentCore = round(len(core) * 1.0 / len(sents) * 100)
+    print(percentCore,
+          ' percent of sentences seem to express the thesis'
+          + ' and main points of an essay')
+
+    essaystructure = prepareSupportingIdeas(core)
+    return essaystructure
+
+def supportingIdeaOptions():
+    csList = parser.send(["AWE_INFO",
+                          document_label,
+                          "supporting_ideas",
+                          "Doc"])
+
+    if csList is None:
+        raise Exception("No information on supporting detail segments retrieved")
+    cs = [[entry['startToken'], entry['endToken']+1] for entry in csList.values()]
+
+    sents = parser.send(["AWE_INFO",
+                         document_label,
+                         "sents",
+                         "Doc"])
+
+    percentSupporting = \
+        round(len(cs) * 1.0 / len(sents) * 100)
+
+    print(percentSupporting,
+          ' percent of sentences seem to express supporting points')
+
+    percentDetail = round(len(cs) * 1.0 / len(sents) * 100)
+
+    supportingideas = prepareSupportingIdeas(cs)
+    return supportingideas
+
+def prepareDetailOptions():
+    csList = parser.send(["AWE_INFO",
+                          document_label,
+                          "supporting_details",
+                          "Doc"])
+    if csList is None:
+        raise Exception("No information on supporting detail segments retrieved")
+    cs = [[entry['startToken'], entry['endToken']+1] for entry in csList.values()]
+
+    sents = parser.send(["AWE_INFO",
+                         document_label,
+                         "sents",
+                         "Doc"])
+
+    percentDetail = round(len(cs) * 1.0 / len(sents) * 100)
+
+    print(percentDetail,
+          ' percent of sentences seem to provide details'
+          + ' elaborating on the main points')
+
+    details = prepareSupportingIdeas(cs)
+    return details
+
+def propositionalAttitudeOptions():
+    pa = parser.send(["AWE_INFO",
                       document_label,
-                      'vwp_statements_of_fact',
-                      'Doc'])
-sf = [[entry['startToken'], entry['endToken']+1] for entry in sfList.values()]
+                      "vwp_propositional_attitudes",
+                      "Doc"])
 
-factualStatements = prepareRangeMarking(tokens, sf)
+    if pa is None:
+        raise Exception("No information on propositional"
+                        + " attitudes retrieved")
 
-ofList = parser.send(['AWE_INFO',
-                      document_label,
-                      'vwp_statements_of_opinion',
-                      'Doc'])
-
-of = [[entry['startToken'], entry['endToken']+1] for entry in ofList.values()]
-
-opinionStatements = prepareRangeMarking(tokens, of)
+    pa_display = displaySingleList(tokList, pa)
+    return pa_display
 
 if option2 == 'Conventions':
+    proofread = proofreadOptions()
     st.write(proofread, unsafe_allow_html=True)
 elif option2 == 'Parts of Speech':
+    POSDisplay = POSOptions()
     st.write(POSDisplay, unsafe_allow_html=True)
 elif option2 == 'Informal Language':
+    interactiveDisplay = informalOptions()
     st.write(interactiveDisplay, unsafe_allow_html=True)
 elif option2 == 'Academic Language':
+    academicPage = academicOptions()
     st.write(academicPage, unsafe_allow_html=True)
 elif option2 == 'Word Frequency':
+    freqDisplay = frequencyOptions()
     st.write(freqDisplay, unsafe_allow_html=True)
 elif option2 == 'Number of Syllables':
+    syllablePage = syllableOptions()
     st.write(syllablePage, unsafe_allow_html=True)
 elif option2 == 'Sentence Variety':
+    ccdPage = sentenceTypeOptions()
     st.write(ccdPage, unsafe_allow_html=True)
 elif option2 == 'Main Ideas':
+    essaystructure = mainIdeaOptions()
     st.write(essaystructure, unsafe_allow_html=True)
 elif option2 == 'Supporting Ideas':
+    supportingideas = supportingIdeaOptions()
     st.write(supportingideas, unsafe_allow_html=True)
 elif option2 == 'Details':
+    details = prepareDetailOptions()
     st.write(details, unsafe_allow_html=True)
 elif option2 == 'Statements of Opinion':
+    opinionStatements = statements_of_opinionOptions()
     st.write(opinionStatements, unsafe_allow_html=True)
 elif option2 == 'Statements of Fact':
+    factualStatements = statements_of_factOptions()
     st.write(factualStatements, unsafe_allow_html=True)
 elif option2 == 'Transitions':
-    st.write(transitions, unsafe_allow_html=True)
+    transitionDisplay = transitionOptions()
+    st.write(transitionDisplay, unsafe_allow_html=True)
 elif option2 == 'Quotations, Citations, Attributions':
+    quoteCite = quoteCiteOptions()
     st.write(quoteCite, unsafe_allow_html=True)
 elif option2 == 'Argument Words':
-    st.write(argumentwords, unsafe_allow_html=True)
+    argumentWords =  argumentWordOptions()
+    st.write(argumentWords, unsafe_allow_html=True)
+elif option2 == 'Propositional Attitudes':
+    pa_display = propositionalAttitudeOptions()
+    st.write(pa_display, unsafe_allow_html=True)
 elif option2 == 'Own vs. Other Perspectives':
+    subjectivities = subjectivityOptions(option2, option3)
     st.write(subjectivities, unsafe_allow_html=True)
 elif option2 == 'Characters':
+    characterPage = characterOptions()
     st.write(characterPage, unsafe_allow_html=True)
 elif option2 == 'Emotion Words':
+    emotionDisplay = emotionOptions()
     st.write(emotionDisplay, unsafe_allow_html=True)
 elif option2 == 'Character Traits':
+    traitDisplay = traitOptions()
     st.write(traitDisplay, unsafe_allow_html=True)
 elif option2 == 'Dialogue':
+    dialogueDisplay = dialogueOptions()
     st.write(dialogueDisplay, unsafe_allow_html=True)
 elif option2 == 'Scene and Setting':
+    sceneSetting = sceneSettingOptions()
     st.write(sceneSetting, unsafe_allow_html=True)
 elif option2 == 'Social Awareness':
+    socialAwarenessPage = socialAwarenessOptions()
     st.write(socialAwarenessPage, unsafe_allow_html=True)
 elif option2 == 'Concrete Details':
+    concreteDetailPage = concreteDetailOptions()
     st.write(concreteDetailPage, unsafe_allow_html=True)
 elif option2 == 'Tone':
+    tonePage = toneOptions()
     st.write(tonePage, unsafe_allow_html=True)

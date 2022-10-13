@@ -37,7 +37,7 @@ manager.parse_and_register_document(doc, 'temp')
 out = manager.get_document('temp')
 print_parse_tree(out)
 doc = out
-print(doc._.AWE_Info(infoType='Doc', indicator='all_cluster_info')) 
+print(doc._.AWE_Info(infoType='Token', indicator='concrete_detail')) 
 
 '''
 content_pos = ['NOUN', 'PROPN', 'VERB', 'ADJ', 'ADV', 'CD']
