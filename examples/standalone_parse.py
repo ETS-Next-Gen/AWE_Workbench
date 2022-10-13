@@ -22,6 +22,11 @@ parser.add_argument(
 args = parser.parse_args()
 doc = open(args.filename).read()
 
+
+# Manager here makes use of the holmes extractor manager object which
+# provides the ability to load and archive working documents in memory.
+# Documents can be registered/deregistered for use.
+
 manager = holmes_extractor.manager.Manager(
             model='en_core_web_lg',
             perform_coreference_resolution=True,
