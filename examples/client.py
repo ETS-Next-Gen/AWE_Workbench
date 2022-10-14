@@ -345,8 +345,11 @@ def parse_and_summarize(document_labels,
                        if indicatorMode == 'text':
                            if 'summaryInfo' in indicatorInfo:
                                if indicatorInfo['summaryInfo'] == 'counts':
-                                   for key in value.keys():
-                                       outinfo['text'] = str(value)
+                                   outinfo['text'] = \
+                                       ', '.join([key + ': ' + str(value[key]) \
+                                                  for key in value])
+                                   #for key in value.keys():
+                                   #    outinfo['text'] = str(value)
                                else:
                                    outinfo['text'] = \
                                        ', '.join(sorted(value))
