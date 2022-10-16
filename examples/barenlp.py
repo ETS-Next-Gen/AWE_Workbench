@@ -13,7 +13,8 @@ nlp = spacy.load("en_core_web_lg")
 
 # Adding all of the components, since
 # each of them turns out to be implicated in
-# the demo list.
+# the demo list. I note below which ones can
+# be loaded separately to support specific indicators.
 nlp.add_pipe('coreferee')
 nlp.add_pipe('spacytextblob')
 nlp.add_pipe('lexicalfeatures')
@@ -91,29 +92,48 @@ print(doc2)
 print('------------------------')
 
 # Define a set of indicators with the kind of filtering/summariation we want
+#
+# Academic Language, Latinate Words, Low Frequency Words, Adjectives, Adverbs,
+#    Sentences, Paragraphs -- 
+#    just need to have lexicalfeatures in the pipeline to run.
+#
+# Transition Words, Ordinal Transition Words --
+#    -- shouldonly need syntaxdiscoursefeats in the pipeline to run
+#
+# Information Sources, Attributions, Citations, Quoted Words, Informal Language
+# Argument Words, Emotion Words, Character Trait Words, Concrete Details --
+#     Need lexicalfeatures + syntaxdiscoursefeats + viewpointfeatures to run
+#
+# Main idea sentences, supporting idea sentences, supporting detail sentences --
+#     Need the full pipeline to run, though the main dependencies are on
+#     lexicalclusters and contentsegmentation
+#
 spanIndicators = [('Academic Language', 'Token', 'is_academic', None, 'percent'),
                   ('Latinate Words', 'Token', 'is_latinate', None, 'percent'),
+                  ('Polysyllabic Words', 'Token', 'nSyll', [('>',[3])], 'percent'),
                   ('Low Frequency Words', 'Token', 'max_freq', [('<',[4])], 'percent'),
-                  ('Concrete Details', 'Token', 'concrete_detail', None, 'percent'),
-                  ('Argument Words', 'Token', 'vwp_explicit_argument', None, 'percent'),
-                  ('Emotion Words', 'Token', 'vwp_emotionword', None, 'percent'),
-                  ('Character Trait Words', 'Token', 'vwp_character', None, 'percent'),
+                  ('Transition Words', 'Doc', 'transitions', None, 'counts'),
+                  ('Ordinal Transition Words', 'Doc', 'transitions',[('==',['ordinal'])], 'total'),
+                  ('Adjectives', 'Token', 'pos_', [('==',['ADJ'])], 'percent'),
+                  ('Adverbs', 'Token', 'pos_', [('==',['ADV'])], 'percent'),
+                  ('Sentence Types', 'Doc', 'sentence_types', None, 'counts'),
+                  ('Simple Sentences', 'Doc', 'sentence_types',[('==',['Simple'])], 'total'),
+                  ('Sentences', 'Doc', 'sents', None, 'total'),
+                  ('Paragraphs', 'Doc', 'delimiter_\n', None, 'total'),
                   ('Information Sources', 'Token', 'vwp_source', None, 'percent'),
                   ('Attributions', 'Token', 'vwp_attribution', None, 'percent'),
                   ('Citations', 'Token', 'vwp_cite', None, 'percent'),
                   ('Quoted Words', 'Token', 'vwp_quoted', None, 'percent'),
                   ('Informal Language', 'Token', 'vwp_interactive', None, 'percent'),
-                  ('Adjectives', 'Token', 'pos_', [('==',['ADJ'])], 'percent'),
-                  ('Adverbs', 'Token', 'pos_', [('==',['ADV'])], 'percent'),
-                  ('Sentences', 'Doc', 'sents', None, 'total'),
-                  ('Paragraphs', 'Doc', 'delimiter_\n', None, 'total'),
+                  ('Argument Words', 'Token', 'vwp_argumentword', None, 'percent'),
+                  ('Emotion Words', 'Token', 'vwp_emotionword', None, 'percent'),
+                  ('Positive Tone', 'Token', 'vwp_tone', [('>',[.4])], 'percent'),
+                  ('Negative Tone', 'Token', 'vwp_tone', [('<',[-.4])], 'percent'),
+                  ('Character Trait Words', 'Token', 'vwp_character', None, 'percent'),
+                  ('Concrete Details', 'Token', 'concrete_details', None, 'percent'),
                   ('Main Idea Sentences', 'Doc', 'main_ideas', None, 'total'),
                   ('Supporting Idea Sentences', 'Doc', 'supporting_ideas', None, 'total'),
-                  ('Supporting Detail Sentences', 'Doc', 'supporting_details', None, 'total'),
-                  ('Sentence Types', 'Doc', 'sentence_types', None, 'counts'),
-                  ('Simple Sentences', 'Doc', 'sentence_types',[('==',['Simple'])], 'total'),
-                  ('Transition Words', 'Doc', 'transitions', None, 'counts'),
-                  ('Ordinal Transition Words', 'Doc', 'transitions',[('==',['ordinal'])], 'total')]
+                  ('Supporting Detail Sentences', 'Doc', 'supporting_details', None, 'total')]
 
 
 # Loop through the indicators and print out the data we got

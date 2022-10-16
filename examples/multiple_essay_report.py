@@ -1522,6 +1522,7 @@ def informalOptions():
                                         document_label,
                                         'vwp_interactive', 'Token'])
 
+    print(ilList)
     if ilList is None:
         raise Exception("No information on interactive language retrieved")
     il = []
@@ -1939,7 +1940,7 @@ def dialogueOptions():
 
     dsList = parser.send(["AWE_INFO",
                          document_label,
-                         "vwp_direct_speech_spans",
+                         "vwp_direct_speech",
                          "Doc"])
     quotedtextList = parser.send(["AWE_INFO",
                                   document_label,
@@ -2231,7 +2232,7 @@ def concreteDetailOptions():
 
     concretedetailsList = parser.send(["AWE_INFO",
                         document_label,
-                        "concrete_detail"])
+                        "concrete_details"])
     concretedetails = [entry['tokenIdx'] \
                        for entry \
                        in concretedetailsList.values()

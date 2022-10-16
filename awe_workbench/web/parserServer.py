@@ -841,7 +841,7 @@ class parserServer:
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
                     doc._.AWE_Info(infoType="Doc",
-                                   indicator='vwp_direct_speech_spans')))
+                                   indicator='vwp_direct_speech')))
             elif messagelist[0] == 'IN_DIRECT_SPEECH':
                 # 1 for tokens within quoted stretches of direct speech,
                 # 0 for other text. Position in the list corresponds to
@@ -1528,7 +1528,7 @@ class parserServer:
                     doc._.AWE_Info(indicator='vwp_argumentation',
                                    summaryType='proportion'),
                     doc._.AWE_Info(infoType="Doc",
-                                   indicator='direct_speech_spans',
+                                   indicator='vwp_direct_speech',
                                    summaryType='proportion'),
                     doc._.AWE_Info(indicator='vwp_egocentric',
                                    summaryType='proportion'),
