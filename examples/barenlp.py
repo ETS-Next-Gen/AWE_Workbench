@@ -108,6 +108,8 @@ print('------------------------')
 #     Need the full pipeline to run, though the main dependencies are on
 #     lexicalclusters and contentsegmentation
 #
+# Format for this list: Label, type of indicator (Token or Doc), indicator name,
+# filter (if needed), summary function to use
 spanIndicators = [('Academic Language', 'Token', 'is_academic', None, 'percent'),
                   ('Latinate Words', 'Token', 'is_latinate', None, 'percent'),
                   ('Polysyllabic Words', 'Token', 'nSyll', [('>',[3])], 'percent'),
