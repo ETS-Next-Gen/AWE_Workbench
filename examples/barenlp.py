@@ -128,6 +128,7 @@ spanIndicators = [('Academic Language', 'Token', 'is_academic', None, 'percent')
                   ('Quoted Words', 'Token', 'vwp_quoted', None, 'percent'),
                   ('Informal Language', 'Token', 'vwp_interactive', None, 'percent'),
                   ('Argument Words', 'Token', 'vwp_argumentword', None, 'percent'),
+                  ('Opinion Words', 'Token', 'vwp_evaluation', None, 'total'),
                   ('Emotion Words', 'Token', 'vwp_emotionword', None, 'percent'),
                   ('Positive Tone', 'Token', 'vwp_tone', [('>',[.4])], 'percent'),
                   ('Negative Tone', 'Token', 'vwp_tone', [('<',[-.4])], 'percent'),
@@ -135,7 +136,8 @@ spanIndicators = [('Academic Language', 'Token', 'is_academic', None, 'percent')
                   ('Concrete Details', 'Token', 'concrete_details', None, 'percent'),
                   ('Main Idea Sentences', 'Doc', 'main_ideas', None, 'total'),
                   ('Supporting Idea Sentences', 'Doc', 'supporting_ideas', None, 'total'),
-                  ('Supporting Detail Sentences', 'Doc', 'supporting_details', None, 'total')]
+                  ('Supporting Detail Sentences', 'Doc', 'supporting_details', None, 'total')
+                  ]
 
 
 # Loop through the indicators and print out the data we got

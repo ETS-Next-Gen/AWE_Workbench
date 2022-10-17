@@ -1104,6 +1104,7 @@ def prepareSubjectivityDisplay(tokens, ps, sm, option2, option3):
     for i, token in enumerate(tokens):
         if i in stancelocs:
             stancemarkers[i] = True
+            print('stancemarker:', token)
 
     print(ps)
     perspectives = ['WRITER'] * len(tokens)
