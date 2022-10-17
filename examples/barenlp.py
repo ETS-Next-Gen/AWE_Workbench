@@ -33,9 +33,10 @@ def outputIndicator(indicatorName, itype, stype=None, text=None, added_filter=No
     indicator = {}
 
     if added_filter is None:
-        theFilter = [(indicatorName,[True])]
+        theFilter = [(indicatorName,[True]),('is_alpha',[True])]
     else:
         theFilter = added_filter
+        theFilter.append(('is_alpha',[True]))
 
     indicator['metric'] =\
         doc2._.AWE_Info(infoType=itype,
