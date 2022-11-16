@@ -9,11 +9,11 @@
 
 # Shared parameters:
 
-PYTHON_CMD="python3.10"
+PYTHON_CMD="python3.9"
 PIP_CMD="pip"
 
 VIRTUAL_ENV_LOC="../../../VirtualENVs"
-VIRTUAL_ENV_NAME="AWEWorkbenchVENV310"
+VIRTUAL_ENV_NAME="AWEWorkbenchVENV39"
 
 CODE_REPOS_LOC="../../"
 
@@ -28,7 +28,7 @@ CODE_REPOS_LOC="../../"
 #     python3.10 -m venv ../VirtualENVs/AWEWorkbenchVENV-3-10
 
 # produce the virtual env.
-echo "=== generating venv ==="
+echo -n "=== generating venv ==="
 "$PYTHON_CMD" -m venv "$VIRTUAL_ENV_LOC/$VIRTUAL_ENV_NAME"
 
 # Initialize
