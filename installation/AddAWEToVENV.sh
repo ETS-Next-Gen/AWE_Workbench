@@ -1,74 +1,65 @@
 #!/usr/bin/env bash
 #
-# AWELanguage Tool, Install Script.
+# Add AWEToVENV
 # Collin F. Lynch
 
-# This script provides for the automated installation of the
-# now componentized AWE Tool in a virtual env.  When run it
-# will carry out the steps serailly.  
+# This script takes as argument a specified VENV.  It
+# then adds the workbench modules to the VENV through
+# the basic install process.  This assumes that it is
+# run in the specified install directory, that all of
+# the necessary modules are present, and that the venv
+# has already been constructed using the script in the
+# servermanagement directory.
 
-# Shared parameters:
 
-PYTHON_CMD="python3.9"
+# Parameters:
+# ---------------------------------------------
+PYTHON_CMD="python"
 PIP_CMD="pip"
-
-VIRTUAL_ENV_LOC="../../../VirtualENVs"
-VIRTUAL_ENV_NAME="AWEWorkbenchVENV39"
 
 CODE_REPOS_LOC="../../"
 
 
+# Argument
+# --------------------------------------------
+VIRTUAL_ENV="$1"
+echo "USING VENV: $VIRTUAL_ENV"
+
+
+# Activate VENV
 # ---------------------------------------------------------
-# 1) Generate new VirtualEnv:
-
-#     python -m venv ../VirtualENVs/AWEWorkbenchVENV
-
-#    Use this format below to set a version:
-   
-#     python3.10 -m venv ../VirtualENVs/AWEWorkbenchVENV-3-10
-
-# produce the virtual env.
-echo -n "=== generating venv ==="
-"$PYTHON_CMD" -m venv "$VIRTUAL_ENV_LOC/$VIRTUAL_ENV_NAME"
-
-# Initialize
-echo -e "\n=== Starting venv ==="
-source "$VIRTUAL_ENV_LOC/$VIRTUAL_ENV_NAME/bin/activate"
-
-# Update the Pip Version.
-pip install --upgrade pip
+source "$VIRTUAL_ENV/bin/activate"
 
 
+# Installation
 # ----------------------------------------------------------
-# Package Installation.
-
 # 2) Change to Repo Directory and load Holmes Expandable:
 #      pip install -e .
 
 echo -e "\n=== Installing Holmes Extractor ==="
-pip install -e "$CODE_REPOS_LOC/holmes-extractor-expandable/"
+"$PIP_CMD" install -e "$CODE_REPOS_LOC/holmes-extractor-expandable/"
 
 
 # 3) Repeat for Language tool.
 echo -e "\n\n=== Installing Language Tool ==="
-pip install -e "$CODE_REPOS_LOC/AWE_LanguageTool"
+"$PIP_CMD" install -e "$CODE_REPOS_LOC/AWE_LanguageTool"
 
 
 # 4) Install Spell Correction
 echo -e "\n\n=== Installing Spell Correction ==="
-pip install -e "$CODE_REPOS_LOC/AWE_SpellCorrect"
+"$PIP_CMD" install -e "$CODE_REPOS_LOC/AWE_SpellCorrect"
 
 # 5) Install Lexica
 echo -e "\n\n=== Installing Lexica ==="
-pip install -e "$CODE_REPOS_LOC/AWE_Lexica"
+"$PIP_CMD" install -e "$CODE_REPOS_LOC/AWE_Lexica"
 
 # 6) Install Componrnts
 echo -e "\n\n === Installing AWE Components ==="
-pip install -e "$CODE_REPOS_LOC/AWE_Components"
+"$PIP_CMD" install -e "$CODE_REPOS_LOC/AWE_Components"
 
 # 7) Install AWE_Workbench
 echo -e "\n\n=== Installing Workbench ==="
-pip install -e "$CODE_REPOS_LOC/AWE_Workbench"
+"$PIP_CMD" install -e "$CODE_REPOS_LOC/AWE_Workbench"
 
 
 
