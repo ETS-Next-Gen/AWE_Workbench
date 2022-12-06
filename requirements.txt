@@ -8,7 +8,7 @@ spacy
 spacytextblob <= 3.0.1
 tensorflow
 scipy
-sklearn
+scikit-learn
 bs4
 rdflib
 jsonpickle
