@@ -37,7 +37,7 @@ manager.parse_and_register_document(doc, 'temp')
 out = manager.get_document('temp')
 print_parse_tree(out)
 doc = out
-print(doc._.AWE_Info(infoType='Token', indicator='concrete_detail')) 
+print(doc._.AWE_Info(infoType='Token', indicator='vwp_argumentation', filters=[('vwp_argumentation',['True'])], summaryType='percent')) 
 
 '''
 content_pos = ['NOUN', 'PROPN', 'VERB', 'ADJ', 'ADV', 'CD']

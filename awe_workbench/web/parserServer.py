@@ -30,7 +30,7 @@ class parserServer:
             extra_components=pipeline_def)
 
         asyncio.get_event_loop().run_until_complete(
-            websockets.serve(self.run_parser, 'localhost', 8766))
+            websockets.serve(self.run_parser, 'localhost', 8766, max_size=2 ** 24))
         print('parser running')
         asyncio.get_event_loop().run_forever()
         print('died')
@@ -116,7 +116,7 @@ class parserServer:
                         'max_paragraph_length',
                         'min_paragraph_length',
                         'stdev_paragraph_length',
-                        'total_transition_words',
+                        'propn_transition_words',
                         'transition_category_count',
                         'transition_word_type_count',
                         'mean_transition_distance',
@@ -225,9 +225,11 @@ class parserServer:
                         'stdev_devword_concreteness']
 
     async def run_parser(self, websocket, path):
+        current_doc = ''
         async for message in websocket:
 
             messagelist = json.loads(message)
+            print(messagelist)
             command = ''
             if messagelist[0] == 'KILL':
                 command = 'KILL'
@@ -245,18 +247,22 @@ class parserServer:
             elif messagelist[0] == 'PARSEONE':
                 command = 'PARSEONE'
                 label = messagelist[1]
-                text = messagelist[2]
+                text = current_doc + messagelist[2]
+                current_doc = ''
                 if label in self.parser.list_document_labels():
                     self.parser.remove_document(label)
                 self.parser.parse_and_register_document(text, label)
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(True))
+            elif messagelist[0] == 'PARTIALTEXT':
+                current_document += messagelist[2]
             elif messagelist[0] == 'PARSESET':
                 command = 'PARSESET'
                 results = []
                 [labels, texts] = messagelist[1]
                 for i, text in enumerate(texts):
                     text = texts[i]
+                    print('parsed document', str(i+1), 'of', len(texts))
                     if text is not None and len(text) > 0:
                         if labels[i] in self.parser.list_document_labels():
                             self.parser.remove_document(labels[i])
@@ -1312,25 +1318,25 @@ class parserServer:
                                    filters=[('is_alpha', ['True']),
                                    ('is_stop', ['False']),
                                    ('pos_', content_pos)], \
-                                   summaryType = 'counts'),
+                                   summaryType = 'total'),
                     doc._.AWE_Info(indicator='lemma_', \
                                    filters=[('is_alpha', ['True']),
                                    ('is_stop', ['False']),
                                    ('pos_', content_pos)], \
-                                   summaryType = 'counts'),
+                                   summaryType = 'total'),
                     doc._.AWE_Info(indicator='lower_', \
                                    filters=[('is_alpha', ['True']),
                                    ('is_stop', ['False']),
                                    ('pos_', content_pos)], \
-                                   summaryType = 'counts'),
+                                   summaryType = 'total'),
                     doc._.AWE_Info(indicator='text', \
                                    filters=[('is_alpha', ['True']),
                                    ('is_stop', ['False']),
                                    ('pos_', content_pos)], \
-                                   summaryType = 'counts'),
+                                   summaryType = 'total'),
                     doc._.AWE_Info(infoType="Doc",
                                    indicator='delimiter_\n',
-                                   summaryType='counts')[0],
+                                   summaryType='total'),
                     doc._.AWE_Info(infoType="Doc",
                                    indicator='sents',
                                    transformations=['tokenlen'],
@@ -1353,10 +1359,10 @@ class parserServer:
                                    summaryType='stdev'),
                     doc._.AWE_Info(infoType="Doc",
                                    indicator='transitions',
-                                   summaryType='total'),
+                                   summaryType='proportion'),
                     doc._.AWE_Info(infoType="Doc",
                                    indicator='transitions',
-                                   summaryType='counts'),
+                                   summaryType='total'),
                     doc._.AWE_Info(infoType="Doc",
                                    indicator='transitions',
                                    transformations=['text'],
@@ -1686,7 +1692,6 @@ class parserServer:
                                    filters=[('is_alpha', ['True']),
                                             ('devword', ['True'])], \
                                    summaryType='stdev')]
-                print(summaryFeats)
                 await websocket.send(json.dumps(summaryFeats))
             else:
                 await websocket.send(False)

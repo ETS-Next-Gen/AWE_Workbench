@@ -102,7 +102,8 @@ print('------------------------')
 #    -- shouldonly need syntaxdiscoursefeats in the pipeline to run
 #
 # Information Sources, Attributions, Citations, Quoted Words, Informal Language
-# Argument Words, Emotion Words, Character Trait Words, Concrete Details --
+# Argument Words, Opinion Words, Emotion Words, Character Trait Words, Concrete Details,
+# Positive and Negative Tone --
 #     Need lexicalfeatures + syntaxdiscoursefeats + viewpointfeatures to run
 #
 # Main idea sentences, supporting idea sentences, supporting detail sentences --

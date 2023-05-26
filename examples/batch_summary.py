@@ -7,6 +7,9 @@ import openpyxl
 import pandas as pd
 import random
 import threading
+import glob
+import path
+import argparse
 from awe_workbench.web.websocketClient import websocketClient
 from awe_languagetool.languagetoolClient import languagetoolClient
 
@@ -39,9 +42,22 @@ def initialize():
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser(description="Parse a student text file")
+    parser.add_argument(
+        '--directory',
+        default="./",
+        help='Which directory to process'
+    )
+
+    args = parser.parse_args()
+
     cs, parser, lt = initialize()
-    ids = ['GRE2','GRE3','GRE4','GRE5','GRE6']
-    docs = ['essays/gre2.txt','essays/gre3.txt','essays/gre4.txt','essays/gre5.txt','essays/gre6.txt']
+
+    pattern = args.directory + '/*.txt'
+    print('processing files in', args.directory)
+    docs = glob.glob(pattern)
+    ids = [path.Path(doc).stem for doc in docs]
+
     data = []
     syntactic_data = []
     doc_contents = []
@@ -52,10 +68,18 @@ if __name__ == '__main__':
 
     print('Running LanguageTool')
     df1 = lt.summarizeMultipleTexts(ids, doc_contents)
-    texts = None
+    
+    #texts = None
     print('Running spellcorrect')
-    texts = cs.send(doc_contents)
-
+    #texts = cs.send(doc_contents)
+    texts = []
+    for doc in doc_contents:
+        
+        [text] = cs.send([doc])
+        texts.append(text)
+     
+    ok = parser.send(['CLEARPARSED'])
+       
     if texts is None:
         print('error')
     else:
@@ -72,6 +96,7 @@ if __name__ == '__main__':
     featnames = ['ID'] + parser.send(['DOCSUMMARYLABELS'])
 
     for i in range(0, len(texts)):
+        print('processing', ids[i])
         newvals = parser.send(['DOCSUMMARYFEATS', ids[i]])
         label = ids[i]
         values = [label]
@@ -82,13 +107,13 @@ if __name__ == '__main__':
         profile['ID'] = label
         if profile is not None:
             syntactic_data.append(profile)
+        ok = parser.send(['REMOVE', ids[i]])
 
-    df1 = pd.DataFrame(data,columns=featnames)
-    df1.set_index('ID', inplace=True)
+    df2 = pd.DataFrame(data,columns=featnames)
+    df2.set_index('ID', inplace=True)
     syntactic_profile = pd.DataFrame.from_records(syntactic_data)
     syntactic_profile = syntactic_profile.fillna(0)
     syntactic_profile.set_index('ID', inplace=True)
-    dfFinal = pd.merge(df1,syntactic_profile, on='ID')
-
-    dfFinal.to_csv("output.csv")
+    dfFinal = pd.merge(df2, pd.merge(df1,syntactic_profile, on='ID'), on='ID')
+    dfFinal.to_csv(args.directory + "/output.csv")
 
