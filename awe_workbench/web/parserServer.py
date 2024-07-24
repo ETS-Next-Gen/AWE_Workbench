@@ -41,188 +41,189 @@ class parserServer:
         exit()
 
     summaryLabels = [
-                        'mean_nSyll',
-                        'med_nSyll',
-                        'max_nSyll',
-                        'min_nSyll',
-                        'std_nSyll',
-                        'mean_sqnChars',
-                        'med_sqnChars',
-                        'max_sqnChars',
-                        'min_sqnChars',
-                        'std_sqnChars',
-                        'propn_latinate',
-                        'propn_academic',
-                        'mean_family_size',
-                        'med_family_size',
-                        'max_family_size',
-                        'min_family_size',
-                        'std_family_size',
-                        'mean_concreteness',
-                        'med_concreteness',
-                        'max_concreteness',
-                        'min_concreteness',
-                        'std_concreteness',
-                        'mean_logNSenses',
-                        'med_logNSenses',
-                        'max_logNSenses',
-                        'min_logNSenses',
-                        'std_logNSenses',
-                        'mean_nMorph',
-                        'med_nMorph',
-                        'max_nMorph',
-                        'min_nMorph',
-                        'std_nMorph',
-                        'mean_logfreq_HAL',
-                        'med_logfreq_HAL',
-                        'max_logfreq_HAL',
-                        'min_logfreq_HAL',
-                        'std_logfreq_HAL',
-                        'mean_root_fam_size',
-                        'med_root_fam_size',
-                        'max_root_fam_size',
-                        'min_root_fam_size',
-                        'std_root_fam_size',
-                        'mean_root_pfmf',
-                        'med_root_pfmf',
-                        'max_root_pfmf',
-                        'min_root_pfmf',
-                        'std_root_pfmf',
-                        'mean_token_frequency',
-                        'median_token_frequency',
-                        'max_token_frequency',
-                        'min_token_frequency',
-                        'std_token_frequency',
-                        'mean_lemma_frequency',
-                        'median_lemma_frequency',
-                        'max_lemma_frequency',
-                        'min_lemma_frequency',
-                        'std_lemma_frequency',
-                        'mean_max_frequency',
-                        'median_max_frequency',
-                        'max_max_frequency',
-                        'min_max_frequency',
-                        'std_max_frequency',
-                        'propn_abstract_traits',
-                        'propn_animates',
-                        'propn_deictics',
-                        'wf_type_count',
-                        'lemma_type_count',
-                        'type_count',
-                        'token_count',
-                        'paragraph_count',
-                        'mean_paragraph_length',
-                        'median_paragraph_length',
-                        'max_paragraph_length',
-                        'min_paragraph_length',
-                        'stdev_paragraph_length',
-                        'propn_transition_words',
-                        'transition_category_count',
-                        'transition_word_type_count',
-                        'mean_transition_distance',
-                        'median_transition_distance',
-                        'max_transition_distance',
-                        'min_transition_distance',
-                        'stdev_transition_distance',
-                        'mean_sent_cohesion',
-                        'median_sent_cohesion',
-                        'max_sent_cohesion',
-                        'min_sent_cohesion',
-                        'stdev_sent_cohesion',
-                        'mean_slider_cohesion',
-                        'median_slider_cohesion',
-                        'max_slider_cohesion',
-                        'min_slider_cohesion',
-                        'stdev_slider_cohesion',
-                        'num_corefs',
-                        'mean_coref_chain_len',
-                        'median_coref_chain_len',
-                        'max_coref_chain_len',
-                        'min_coref_chain_len',
-                        'stdev_coref_chain_len',
-                        'sentence_count',
-                        'mean_sentence_len',
-                        'median_sentence_len',
-                        'max_sentence_len',
-                        'min_sentence_len',
-                        'std_sentence_len',
-                        'mean_words_to_sentence_root',
-                        'median_words_to_sentence_root',
-                        'max_words_to_sentence_root',
-                        'min_words_to_sentence_root',
-                        'stdev_words_to_sentence_root',
-                        'meanRhemeDepth',
-                        'medianRhemeDepth',
-                        'maxRhemeDepth',
-                        'minRhemeDepth',
-                        'stdevRhemeDepth',
-                        'meanThemeDepth',
-                        'medianThemeDepth',
-                        'maxThemeDepth',
-                        'minThemeDepth',
-                        'stdevThemeDepth',
-                        'meanWeightedDepth',
-                        'medianWeightedDepth',
-                        'maxWeightedDepth',
-                        'minWeightedDepth',
-                        'stdevWeightedDepth',
-                        'meanWeightedBreadth',
-                        'medianWeightedBreadth',
-                        'maxWeightedBreadth',
-                        'minWeightedBreadth',
-                        'stdevWeightedBreadth',
-                        'syntacticVariety',
-                        'propn_past',
-                        'propn_argument_words',
-                        'propn_direct_speech',
-                        'propn_egocentric',
-                        'propn_allocentric',
-                        'mean_subjectivity',
-                        'median_subjectivity',
-                        'min_subjectivity',
-                        'max_subjectivity',
-                        'stdev_subjectivity',
-                        'mean_polarity',
-                        'median_polarity',
-                        'min_polarity',
-                        'max_polarity',
-                        'stdev_polarity',
-                        'mean_sentiment',
-                        'median_sentiment',
-                        'min_sentiment',
-                        'max_sentiment',
-                        'stdev_sentiment',
-                        'mean_main_cluster_span',
-                        'median_main_cluster_span',
-                        'min_main_cluster_span',
-                        'max_main_cluster_span',
-                        'stdev_main_cluster_span',
-                        'propn_devwords',
-                        'mean_devword_nsyll',
-                        'median_devword_nsyll',
-                        'min_devword_nsyll',
-                        'max_devword_nsyll',
-                        'stdev_devword_nsyll',
-                        'mean_devword_nmorph',
-                        'median_devword_nmorph',
-                        'min_devword_nmorph',
-                        'max_devword_nmorph',
-                        'stdev_devword_nmorph',
-                        'mean_devword_nsenses',
-                        'median_devword_nsenses',
-                        'min_devword_nsenses',
-                        'max_devword_nsenses',
-                        'stdev_devword_nsenses',
-                        'mean_devword_token_freq',
-                        'median_devword_token_freq',
-                        'min_devword_token_freq',
-                        'max_devword_token_freq',
-                        'stdev_devword_token_freq',
-                        'mean_devword_concreteness',
-                        'median_devword_concreteness',
-                        'min_devword_concreteness',
-                        'max_devword_concreteness',
-                        'stdev_devword_concreteness']
+        'mean_nSyll',
+        'med_nSyll',
+        'max_nSyll',
+        'min_nSyll',
+        'std_nSyll',
+        'mean_sqnChars',
+        'med_sqnChars',
+        'max_sqnChars',
+        'min_sqnChars',
+        'std_sqnChars',
+        'propn_latinate',
+        'propn_academic',
+        'mean_family_size',
+        'med_family_size',
+        'max_family_size',
+        'min_family_size',
+        'std_family_size',
+        'mean_concreteness',
+        'med_concreteness',
+        'max_concreteness',
+        'min_concreteness',
+        'std_concreteness',
+        'mean_logNSenses',
+        'med_logNSenses',
+        'max_logNSenses',
+        'min_logNSenses',
+        'std_logNSenses',
+        'mean_nMorph',
+        'med_nMorph',
+        'max_nMorph',
+        'min_nMorph',
+        'std_nMorph',
+        'mean_logfreq_HAL',
+        'med_logfreq_HAL',
+        'max_logfreq_HAL',
+        'min_logfreq_HAL',
+        'std_logfreq_HAL',
+        'mean_root_fam_size',
+        'med_root_fam_size',
+        'max_root_fam_size',
+        'min_root_fam_size',
+        'std_root_fam_size',
+        'mean_root_pfmf',
+        'med_root_pfmf',
+        'max_root_pfmf',
+        'min_root_pfmf',
+        'std_root_pfmf',
+        'mean_token_frequency',
+        'median_token_frequency',
+        'max_token_frequency',
+        'min_token_frequency',
+        'std_token_frequency',
+        'mean_lemma_frequency',
+        'median_lemma_frequency',
+        'max_lemma_frequency',
+        'min_lemma_frequency',
+        'std_lemma_frequency',
+        'mean_max_frequency',
+        'median_max_frequency',
+        'max_max_frequency',
+        'min_max_frequency',
+        'std_max_frequency',
+        'propn_abstract_traits',
+        'propn_animates',
+        'propn_deictics',
+        'wf_type_count',
+        'lemma_type_count',
+        'type_count',
+        'token_count',
+        'paragraph_count',
+        'mean_paragraph_length',
+        'median_paragraph_length',
+        'max_paragraph_length',
+        'min_paragraph_length',
+        'stdev_paragraph_length',
+        'propn_transition_words',
+        'transition_category_count',
+        'transition_word_type_count',
+        'mean_transition_distance',
+        'median_transition_distance',
+        'max_transition_distance',
+        'min_transition_distance',
+        'stdev_transition_distance',
+        'mean_sent_cohesion',
+        'median_sent_cohesion',
+        'max_sent_cohesion',
+        'min_sent_cohesion',
+        'stdev_sent_cohesion',
+        'mean_slider_cohesion',
+        'median_slider_cohesion',
+        'max_slider_cohesion',
+        'min_slider_cohesion',
+        'stdev_slider_cohesion',
+        'num_corefs',
+        'mean_coref_chain_len',
+        'median_coref_chain_len',
+        'max_coref_chain_len',
+        'min_coref_chain_len',
+        'stdev_coref_chain_len',
+        'sentence_count',
+        'mean_sentence_len',
+        'median_sentence_len',
+        'max_sentence_len',
+        'min_sentence_len',
+        'std_sentence_len',
+        'mean_words_to_sentence_root',
+        'median_words_to_sentence_root',
+        'max_words_to_sentence_root',
+        'min_words_to_sentence_root',
+        'stdev_words_to_sentence_root',
+        'meanRhemeDepth',
+        'medianRhemeDepth',
+        'maxRhemeDepth',
+        'minRhemeDepth',
+        'stdevRhemeDepth',
+        'meanThemeDepth',
+        'medianThemeDepth',
+        'maxThemeDepth',
+        'minThemeDepth',
+        'stdevThemeDepth',
+        'meanWeightedDepth',
+        'medianWeightedDepth',
+        'maxWeightedDepth',
+        'minWeightedDepth',
+        'stdevWeightedDepth',
+        'meanWeightedBreadth',
+        'medianWeightedBreadth',
+        'maxWeightedBreadth',
+        'minWeightedBreadth',
+        'stdevWeightedBreadth',
+        'syntacticVariety',
+        'propn_past',
+        'propn_argument_words',
+        'propn_direct_speech',
+        'propn_egocentric',
+        'propn_allocentric',
+        'mean_subjectivity',
+        'median_subjectivity',
+        'min_subjectivity',
+        'max_subjectivity',
+        'stdev_subjectivity',
+        'mean_polarity',
+        'median_polarity',
+        'min_polarity',
+        'max_polarity',
+        'stdev_polarity',
+        'mean_sentiment',
+        'median_sentiment',
+        'min_sentiment',
+        'max_sentiment',
+        'stdev_sentiment',
+        'mean_main_cluster_span',
+        'median_main_cluster_span',
+        'min_main_cluster_span',
+        'max_main_cluster_span',
+        'stdev_main_cluster_span',
+        'propn_devwords',
+        'mean_devword_nsyll',
+        'median_devword_nsyll',
+        'min_devword_nsyll',
+        'max_devword_nsyll',
+        'stdev_devword_nsyll',
+        'mean_devword_nmorph',
+        'median_devword_nmorph',
+        'min_devword_nmorph',
+        'max_devword_nmorph',
+        'stdev_devword_nmorph',
+        'mean_devword_nsenses',
+        'median_devword_nsenses',
+        'min_devword_nsenses',
+        'max_devword_nsenses',
+        'stdev_devword_nsenses',
+        'mean_devword_token_freq',
+        'median_devword_token_freq',
+        'min_devword_token_freq',
+        'max_devword_token_freq',
+        'stdev_devword_token_freq',
+        'mean_devword_concreteness',
+        'median_devword_concreteness',
+        'min_devword_concreteness',
+        'max_devword_concreteness',
+        'stdev_devword_concreteness'
+    ]
 
     async def run_parser(self, websocket, path):
         current_doc = ''
@@ -347,15 +348,13 @@ class parserServer:
                     indic = messagelist[2]
                     itype = messagelist[3]
                     await websocket.send(
-                        doc._.AWE_Info(indicator=indic,
-                                       infoType=itype))
+                        doc._.AWE_Info(indicator=indic,infoType=itype))
                 elif len(messagelist) == 5:
                     indic = messagelist[2]
                     itype = messagelist[3]
                     summ = messagelist[4]
-                    result = doc._.AWE_Info(indicator=indic,
-                                            infoType=itype,
-                                            summaryType=summ)
+                    result = \
+                        doc._.AWE_Info(indicator=indic,infoType=itype,summaryType=summ)
                     if type(result) in [int, float, bool]:
                         await websocket.send(str(result))
                     else:
@@ -366,10 +365,8 @@ class parserServer:
                     itype = messagelist[3]
                     summ = messagelist[4]
                     filt = json.loads(messagelist[5])
-                    result = doc._.AWE_Info(indicator=indic,
-                                       infoType=itype,
-                                       summaryType=summ,
-                                       filters=filt)
+                    result = \
+                        doc._.AWE_Info(indicator=indic,infoType=itype,summaryType=summ,filters=filt)
                     if type(result) in [int, float]:
                         await websocket.send(str(result))
                     else:
@@ -380,11 +377,8 @@ class parserServer:
                     summ = messagelist[4]
                     filt = json.loads(messagelist[5])
                     trans = json.loads(messagelist[6])
-                    result = doc._.AWE_Info(indicator=indic,
-                                       infoType=itype,
-                                       summaryType=summ,
-                                       filters=filt,
-                                       transformations=trans)
+                    result = \
+                        doc._.AWE_Info(indicator=indic,infoType=itype,summaryType=summ,filters=filt,transformations=trans)
                     if type(result) in [int, float]:
                         await websocket.send(str(result))
                     else:
@@ -455,25 +449,29 @@ class parserServer:
                 command = 'LEMMAS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
-\
-                await websocket.send(doc._.AWE_Info(indicator='lemma_'))
+                await websocket.send(
+                    doc._.AWE_Info(indicator='lemma_')
+                )
             elif messagelist[0] == 'STOPWORDS':
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
-                await websocket.send(doc._.AWE_Info(indicator='is_stop'))
+                await websocket.send(
+                    doc._.AWE_Info(indicator='is_stop')
+                )
             elif messagelist[0] == 'WORDTYPES':
                 command = 'WORDTYPES'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
-                await websocket.send(json.dumps(doc._.AWE_Info(
-                    indicator='lower_',filters=[('is_alpha', ['True']),
-                    ('is_stop', ['False'])],summaryType = 'uniq')))
+                await websocket.send(json.dumps(
+                    doc._.AWE_Info(indicator='lower_',filters=[('is_alpha', ['True']),('is_stop', ['False'])],summaryType = 'uniq')
+                ))
             elif messagelist[0] == 'ROOTS':
                 command = 'ROOTS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='root')))
+                    doc._.AWE_Info(indicator='root')
+                ))
             elif messagelist[0] == 'SYLLABLES':
                 command = 'SYLLABLES'
                 label = messagelist[1]
@@ -485,23 +483,22 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='text', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['len', 'sqrt'])))
+                    doc._.AWE_Info(indicator='text', filters=[('is_alpha', ['True'])], transformations=['len', 'sqrt'])
+                ))
             elif messagelist[0] == 'LATINATES':
                 command = 'LATINATES'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='is_latinate',
-                                   filters=[('is_alpha', ['True'])])))
+                    doc._.AWE_Info(indicator='is_latinate',filters=[('is_alpha', ['True'])])
+                ))
             elif messagelist[0] == 'ACADEMICS':
                 command = 'ACADEMICS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='is_academic',
-                                   filters=[('is_alpha', ['True'])])))
+                    doc._.AWE_Info(indicator='is_academic',filters=[('is_alpha', ['True'])])
+                ))
             elif messagelist[0] == 'SENSENUMS':
                 command = 'SENSENUMS'
                 # Position in the list returned equals position
@@ -509,44 +506,43 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='nSenses',
-                                   filters=[('is_alpha', ['True'])])))
+                    doc._.AWE_Info(indicator='nSenses',filters=[('is_alpha', ['True'])])
+                ))
             elif messagelist[0] == 'LOGSENSENUMS':
                 command = 'LOGSENSENUMS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='nSenses',
-                                   filters=[('is_alpha', ['True'])],
-                                   transformations=['log'])))
+                    doc._.AWE_Info(indicator='nSenses',filters=[('is_alpha', ['True'])],transformations=['log'])
+                ))
             elif messagelist[0] == 'MORPHOLOGY':
                 command = 'MORPHOLOGY'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='morphology')))
+                    doc._.AWE_Info(indicator='morphology')
+                ))
             elif messagelist[0] == 'MORPHNUMS':
                 command = 'MORPHNUMS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='nMorph',
-                                   filters=[('is_alpha', ['True'])])))
+                    doc._.AWE_Info(indicator='nMorph',filters=[('is_alpha', ['True'])])
+                ))
             elif messagelist[0] == 'HALROOTFREQS':
                 command = 'HALROOTFREQS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='min_root_freq',
-                                   filters=[('is_alpha', ['True'])])))
+                    doc._.AWE_Info(indicator='min_root_freq',filters=[('is_alpha', ['True'])])
+                ))
             elif messagelist[0] == 'HALLOGROOTFREQS':
                 command = 'HALLOGROOTFREQS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='min_root_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   transformations=['log'])))
+                    doc._.AWE_Info(indicator='min_root_freq',filters=[('is_alpha', ['True'])],transformations=['log'])
+                ))
             elif messagelist[0] == 'ROOTFAMSIZES':
                 command = 'ROOTFAMSIZES'
                 # Position in the list returned equals position
@@ -554,8 +550,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='root_famSize',
-                                   filters=[('is_alpha', ['True'])])))
+                    doc._.AWE_Info(indicator='root_famSize',filters=[('is_alpha', ['True'])])
+                ))
             elif messagelist[0] == 'ROOTPFMFS':
                 command = 'ROOTPFMFS'
                 # Position in the list returned equals position
@@ -563,8 +559,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='root_pfmf',
-                                   filters=[('is_alpha', ['True'])])))
+                    doc._.AWE_Info(indicator='root_pfmf',filters=[('is_alpha', ['True'])])
+                ))
             elif messagelist[0] == 'FAMILYSIZES':
                 command = 'FAMILYSIZES'
                 # Position in the list returned equals position
@@ -572,8 +568,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='family_size',
-                                   filters=[('is_alpha', ['True'])])))
+                    doc._.AWE_Info(indicator='family_size',filters=[('is_alpha', ['True'])])
+                ))
             elif messagelist[0] == 'TOKFREQS':
                 command = 'TOKFREQS'
                 # Position in the list returned equals position
@@ -581,8 +577,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='token_freq',
-                                   filters=[('is_alpha', ['True'])])))
+                    doc._.AWE_Info(indicator='token_freq',filters=[('is_alpha', ['True'])])
+                ))
             elif messagelist[0] == 'LEMMAFREQS':
                 command = 'LEMMAfREQS'
                 # Position in the list returned equals position
@@ -613,7 +609,7 @@ class parserServer:
                 # in the document
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
-                await websocket.send(json_dumps(
+                await websocket.send(json.dumps(
                     doc._.AWE_Info(indicator='concreteness')))
             elif messagelist[0] == 'ABSTRACTTRAITS':
                 command = 'ABSTRACTTRAITS'
@@ -659,8 +655,8 @@ class parserServer:
                 doc = self.parser.get_document(label)
                                     
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType="Doc",
-                    indicator='delimiter_\n')))
+                    doc._.AWE_Info(infoType="Doc",indicator='delimiter_n')
+                ))
                     # doc._.paragraph_breaks))
             elif messagelist[0] == 'SENTENCES':
                 command = 'SENTENCES'
@@ -670,8 +666,8 @@ class parserServer:
                 doc = self.parser.get_document(label)
                 
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents')))
+                    doc._.AWE_Info(infoType="Doc",indicator='sents')
+                ))
                 #await websocket.send(json.dumps(
                 #    [(sent.start, sent.end) for sent in doc.sents]))
             elif messagelist[0] == 'PARAGRAPHLENS':
@@ -681,9 +677,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                                     doc._.AWE_Info(infoType="Doc",
-                                                    indicator='sents',
-                                                    transformations=['tokenlen'])))
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['tokenlen'])
+                ))
             elif messagelist[0] == 'TRANSITIONPROFILE':
                 command = 'TRANSITIONPROFILE'
                 # Returns a rich data structure in a list containing
@@ -704,8 +699,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType='Doc',
-                                   indicator='transitions')))
+                    doc._.AWE_Info(infoType='Doc',indicator='transitions')
+                ))
             elif messagelist[0] == 'TRANSITIONDISTANCES':
                 command = 'TRANSITIONDISTANCES'
                 # List of cosine distances between ten-word windows
@@ -713,8 +708,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType='Doc',
-                                   indicator='transition_distances')))
+                    doc._.AWE_Info(infoType='Doc',indicator='transition_distances')
+                ))
             elif messagelist[0] == 'SENTENCECOHESIONS':
                 command = 'SENTENCECOHESIONS'
                 # List of cosine distances between ten-word windows
@@ -722,8 +717,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType='Doc',
-                                   indicator='intersentence_cohesions')))
+                    doc._.AWE_Info(infoType='Doc',indicator='intersentence_cohesions')
+                ))
             elif messagelist[0] == 'SLIDERCOHESIONS':
                 command = 'SLIDERCOHESIONS'
                 # List of cosine distances between ten-word windows
@@ -731,8 +726,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType='Doc',
-                                   indicator='sliding_window_cohesions')))
+                    doc._.AWE_Info(infoType='Doc',indicator='sliding_window_cohesions')
+                ))
             elif messagelist[0] == 'COREFCHAINS':
                 command = 'COREFCHAINS'
                 # List of coreference chains found in document
@@ -748,8 +743,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType='Doc',
-                                   indicator='syntacticDepthsOfRhemes')))
+                    doc._.AWE_Info(infoType='Doc',indicator='syntacticDepthsOfRhemes')
+                ))
             elif messagelist[0] == 'THEMEDEPTHS':
                 command = 'THEMEDEPTHS'
                 # Syntactic depth of the sentence theme -- part
@@ -758,7 +753,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='syntacticDepthsOfThemes')))
+                    doc._.AWE_Info(indicator='syntacticDepthsOfThemes')
+                ))
             elif messagelist[0] == 'WEIGHTEDDEPTHS':
                 command = 'WEIGHTEDDEPTHS'
                 # Syntactic depth weighted to penalize
@@ -767,7 +763,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='weightedSyntacticDepths')))
+                    doc._.AWE_Info(indicator='weightedSyntacticDepths')
+                ))
             elif messagelist[0] == 'WEIGHTEDBREADTHS':
                 command = 'WEIGHTEDBREADTHS'
                 # Syntactic breadth -- measure of extent to which sentence
@@ -777,7 +774,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='weightedSyntacticBreadths')))
+                    doc._.AWE_Info(indicator='weightedSyntacticBreadths')
+                ))
             elif messagelist[0] == 'SENTENCETYPES':
                 # tuple giving number and location of sentence types
                 # format:
@@ -788,8 +786,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType='Doc',
-                                   indicator='sentence_types')))
+                    doc._.AWE_Info(infoType='Doc',indicator='sentence_types')
+                ))
             elif messagelist[0] == 'SYNTACTICPROFILE':
                 command = 'SYNTACTICPROFILE'
                 # Returns a dictionary containing frequency information
@@ -818,7 +816,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_quoted')))
+                    doc._.AWE_Info(indicator='vwp_quoted')
+                ))
             elif messagelist[0] == 'DIRECTSPEECHSPANS':
                 command = 'DIRECTSPEECHSPANS'
                 # Data about subset of quoted text -- specifically,
@@ -846,8 +845,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='vwp_direct_speech')))
+                    doc._.AWE_Info(infoType="Doc",indicator='vwp_direct_speech')
+                ))
             elif messagelist[0] == 'IN_DIRECT_SPEECH':
                 # 1 for tokens within quoted stretches of direct speech,
                 # 0 for other text. Position in the list corresponds to
@@ -855,7 +854,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_in_direct_speech')))
+                    doc._.AWE_Info(indicator='vwp_in_direct_speech')
+                ))
             elif messagelist[0] == 'TENSECHANGES':
                 # list of positions where tense changed in the main
                 # document flow (not in direct speech/quotations,
@@ -870,39 +870,43 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_perspective')))
+                    doc._.AWE_Info(indicator='vwp_perspective')
+                ))
             elif messagelist[0] == 'ATTRIBUTIONS':
                 # list of positions where attribution is indicated
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_attribution')))
+                    doc._.AWE_Info(indicator='vwp_attribution')
+                ))
             elif messagelist[0] == 'SOURCES':
                 # list of positions where source is indicated
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_source')))
+                    doc._.AWE_Info(indicator='vwp_source')
+                ))
             elif messagelist[0] == 'CITES':
                 # list of positions where source is indicated
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_cite')))
+                    doc._.AWE_Info(indicator='vwp_cite')
+                ))
             elif messagelist[0] == 'STATEMENTSOFFACT':
                 # list of positions where source is indicated
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='vwp_statements_of_fact')))
+                    doc._.AWE_Info(infoType="Doc",indicator='vwp_statements_of_fact')
+                ))
             elif messagelist[0] == 'STATEMENTSOFOPINION':
                 # list of positions where source is indicated
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='vwp_statements_of_opinion')))
+                    doc._.AWE_Info(infoType="Doc",indicator='vwp_statements_of_opinion')
+                ))
             elif messagelist[0] == 'PERSPECTIVESPANS':
                 command = 'PERSPECTIVESPANS'
                 label = messagelist[1]
@@ -910,50 +914,54 @@ class parserServer:
                 await websocket.send(json.dumps(
                     doc._.vwp_perspective_spans))
                 await websocket.send(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='vwp_perspective_spans'))
+                    doc._.AWE_Info(infoType="Doc",indicator='vwp_perspective_spans')
+                )
             elif messagelist[0] == 'STANCEMARKERS':
                 command = 'STANCEMARKERS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(doc._.vwp_stance_markers))
                 await websocket.send(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='vwp_stance_markers'))
+                    doc._.AWE_Info(infoType="Doc",indicator='vwp_stance_markers')
+                )
 
             elif messagelist[0] == 'CLAIMTEXTS':
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_claim')))
+                    doc._.AWE_Info(indicator='vwp_claim')
+                ))
 
             elif messagelist[0] == 'DISCUSSIONTEXTS':
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_discussion')))
+                    doc._.AWE_Info(indicator='vwp_discussion')
+                ))
 
             elif messagelist[0] == 'EMOTIONWORDS':
                 command = 'EMOTIONWORDS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_emotionword')))
+                    doc._.AWE_Info(indicator='vwp_emotionword')
+                ))
 
             elif messagelist[0] == 'CHARACTERWORDS':
                 command = 'CHARACTERWORDS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_character_traits')))
+                    doc._.AWE_Info(indicator='vwp_character_traits')
+                ))
 
             elif messagelist[0] == 'EMOTIONALSTATES':
                 command = 'EMOTIONALSTATES'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='vwp_emotion_states'))
+                    doc._.AWE_Info(infoType="Doc",indicator='vwp_emotion_states')
+                )
             elif messagelist[0] == 'CHARACTERTRAITS':
                 command = 'CHARACTERTRAITS'
                 label = messagelist[1]
@@ -965,68 +973,77 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='vwp_propositional_attitudes')))
+                    doc._.AWE_Info(infoType="Doc",indicator='vwp_propositional_attitudes')
+                ))
             elif messagelist[0] == 'SOCIAL_AWARENESS':
                 command = 'SOCIAL_AWARENESS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='vwp_social_awareness')))
+                    doc._.AWE_Info(infoType="Doc",indicator='vwp_social_awareness')
+                ))
             elif messagelist[0] == 'CONCRETEDETAILS':
                 command = 'CONCRETEDETAILS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(
-                    doc._.AWE_Info(indicator='concrete_detail'))
+                    doc._.AWE_Info(indicator='concrete_detail')
+                )
             elif messagelist[0] == 'INTERACTIVELANGUAGE':
                 command = 'INTERACTIVELANGUAGE'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_interactive')))
+                    doc._.AWE_Info(indicator='vwp_interactive')
+                ))
             elif messagelist[0] == 'ARGUMENTWORDS':
                 command = 'ARGUMENTWORDS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_argumentword')))
+                    doc._.AWE_Info(indicator='vwp_argumentword')
+                ))
             elif messagelist[0] == 'ARGUMENTLANGUAGE':
                 command = 'ARGUMENTLANGUAGE'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_argumentation')))
+                    doc._.AWE_Info(indicator='vwp_argumentation')
+                ))
             elif messagelist[0] == 'EXPLICITARGUMENTWORDS':
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='vwp_explicit_argument')))
+                    doc._.AWE_Info(indicator='vwp_explicit_argument')
+                ))
             elif messagelist[0] == 'SUBJECTIVITYRATINGS':
                 command = 'SUBJECTIVITYRATINGS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(                    
-                    doc._.AWE_Info(indicator='subjectivity')))
+                    doc._.AWE_Info(indicator='subjectivity')
+                ))
             elif messagelist[0] == 'SENTIMENTRATINGS':
                 command = 'SENTIMENTRATINGS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(                    
-                    doc._.AWE_Info(indicator='vwp_sentiment')))
+                    doc._.AWE_Info(indicator='vwp_sentiment')
+                ))
             elif messagelist[0] == 'TONERATINGS':
                 command = 'TONERATINGS2'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(                    
-                    doc._.AWE_Info(indicator='vwp_tone')))
+                    doc._.AWE_Info(indicator='vwp_tone')
+                ))
             elif messagelist[0] == 'POLARITYRATINGS':
                 command = 'POLARITYRATINGS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(                    
-                    doc._.AWE_Info(indicator='polarity')))
+                    doc._.AWE_Info(indicator='polarity')
+                ))
             elif messagelist[0] == 'ASSESSMENTS':
                 command = 'ASSESSMENTS'
                 label = messagelist[1]
@@ -1037,18 +1054,21 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='in_past_tense_scope')))
+                    doc._.AWE_Info(indicator='in_past_tense_scope')
+                ))
             elif messagelist[0] == 'GOVERNINGSUBJECTS':
                 command = 'GOVERNINGSUBJECTS'
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='governing_subject')))
+                    doc._.AWE_Info(indicator='governing_subject')
+                ))
             elif messagelist[0] == 'CLUSTERS':
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='clusterID')))
+                    doc._.AWE_Info(indicator='clusterID')
+                ))
             elif messagelist[0] == 'PROMPTLANGUAGE':
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
@@ -1061,20 +1081,20 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='main_ideas'))
+                    doc._.AWE_Info(infoType="Doc",indicator='main_ideas')
+                )
             elif messagelist[0] == 'SUPPORTINGIDEAS':
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='supporting_ideas'))
+                    doc._.AWE_Info(infoType="Doc",indicator='supporting_ideas')
+                )
             elif messagelist[0] == 'SUPPORTINGDETAILS':
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='supporting_details'))
+                    doc._.AWE_Info(infoType="Doc",indicator='supporting_details')
+                )
             elif messagelist[0] == 'CLUSTERINFO':
                 command = 'CLUSTERINFO'
                 # Get the local word clusters our algorithm has
@@ -1098,7 +1118,8 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 await websocket.send(json.dumps(
-                    doc._.AWE_Info(indicator='devword')))
+                    doc._.AWE_Info(indicator='devword')
+                ))
             elif messagelist[0] == 'NOMINALREFERENCES':
                 command = 'NOMINALREFERENCES'
                 # offset of the logical subject that governs
@@ -1114,584 +1135,189 @@ class parserServer:
                 label = messagelist[1]
                 doc = self.parser.get_document(label)
                 summaryFeats = [
-                    doc._.AWE_Info(indicator='nSyll',
-                                   summaryType="mean"),
-                    doc._.AWE_Info(indicator='nSyll',
-                                   summaryType="median"),
-                    doc._.AWE_Info(indicator='nSyll',
-                                   summaryType="max"),
-                    doc._.AWE_Info(indicator='nSyll',
-                                   summaryType="min"),
-                    doc._.AWE_Info(indicator='nSyll',
-                                   summaryType="stdev"),
-                    doc._.AWE_Info(indicator='text', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['len', 'sqrt'], \
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='text', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['len', 'sqrt'], \
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='text', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['len', 'sqrt'], \
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='text', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['len', 'sqrt'], \
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='text', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['len', 'sqrt'], \
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='is_latinate',
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType="proportion"),
-                    doc._.AWE_Info(indicator='is_academic',
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType="proportion"),
-                    doc._.AWE_Info(indicator='family_size', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='family_size', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='family_size', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='family_size', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='family_size', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='concreteness', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='concreteness', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='concreteness', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='concreteness', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='concreteness', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='nSenses', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['log'], \
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='nSenses', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['log'], \
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='nSenses', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['log'], \
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='nSenses', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['log'], \
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='nSenses', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   transformations=['log'], \
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='nMorph', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='nMorph', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='nMorph', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='nMorph', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='nMorph', \
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='min_root_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   transformations=['log'],
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='min_root_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   transformations=['log'],
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='min_root_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   transformations=['log'],
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='min_root_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   transformations=['log'],
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='min_root_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   transformations=['log'],
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='root_famSize',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='root_famSize',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='root_famSize',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='root_famSize',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='root_famSize',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='root_pfmf',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='root_pfmf',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='root_pfmf',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='root_pfmf',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='root_pfmf',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='token_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='token_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='token_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='token_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='token_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='lemma_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='lemma_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='lemma_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='lemma_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='lemma_freq',
-                                   filters=[('is_alpha', ['True'])],
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='max_freq',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='max_freq',
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='max_freq',
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='max_freq',
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='max_freq',
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='abstract_trait',
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType="proportion"),
-                    doc._.AWE_Info(indicator='animate',
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType="proportion"),
-                    doc._.AWE_Info(indicator='deictic',
-                                   filters=[('is_alpha', ['True'])], \
-                                   summaryType="proportion"),
-                    doc._.AWE_Info(indicator='root', \
-                                   filters=[('is_alpha', ['True']),
-                                   ('is_stop', ['False']),
-                                   ('pos_', content_pos)], \
-                                   summaryType = 'total'),
-                    doc._.AWE_Info(indicator='lemma_', \
-                                   filters=[('is_alpha', ['True']),
-                                   ('is_stop', ['False']),
-                                   ('pos_', content_pos)], \
-                                   summaryType = 'total'),
-                    doc._.AWE_Info(indicator='lower_', \
-                                   filters=[('is_alpha', ['True']),
-                                   ('is_stop', ['False']),
-                                   ('pos_', content_pos)], \
-                                   summaryType = 'total'),
-                    doc._.AWE_Info(indicator='text', \
-                                   filters=[('is_alpha', ['True']),
-                                   ('is_stop', ['False']),
-                                   ('pos_', content_pos)], \
-                                   summaryType = 'total'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='delimiter_\n',
-                                   summaryType='total'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   transformations=['tokenlen'],
-                                   summaryType='mean'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   transformations=['tokenlen'],
-                                   summaryType='median'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   transformations=['tokenlen'],
-                                   summaryType='max'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   transformations=['tokenlen'],
-                                   summaryType='min'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   transformations=['tokenlen'],
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='transitions',
-                                   summaryType='proportion'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='transitions',
-                                   summaryType='total'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='transitions',
-                                   transformations=['text'],
-                                   summaryType='counts'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='transition_distances',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='transition_distances',
-                                   summaryType='median'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='transition_distances',
-                                   summaryType='max'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='transition_distances',
-                                   summaryType='min'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='transition_distances',
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='intersentence_cohesions',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='intersentence_cohesions',
-                                   summaryType='median'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='intersentence_cohesions',
-                                   summaryType='max'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='intersentence_cohesions',
-                                   summaryType='min'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='intersentence_cohesions',
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sliding_window_cohesions',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sliding_window_cohesions',
-                                   summaryType='median'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sliding_window_cohesions',
-                                   summaryType='max'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sliding_window_cohesions',
-                                   summaryType='min'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sliding_window_cohesions',
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='corefChainInfo',
-                                   summaryType='counts'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='corefChainInfo',
-                                   transformations=['len'],
-                                   summaryType='mean'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='corefChainInfo',
-                                   transformations=['len'],
-                                   summaryType='median'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='corefChainInfo',
-                                   transformations=['len'],
-                                   summaryType='max'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='corefChainInfo',
-                                   transformations=['len'],
-                                   summaryType='min'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='corefChainInfo',
-                                   transformations=['len'],
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   summaryType='counts'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   transformations=['len'],
-                                   summaryType='mean'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   transformations=['len'],
-                                   summaryType='median'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   transformations=['len'],
-                                   summaryType='max'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   transformations=['len'],
-                                   summaryType='min'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sents',
-                                   transformations=['len'],
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sentenceThemes',
-                                   transformations=['tokenlen'],
-                                   summaryType='mean'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sentenceThemes',
-                                   transformations=['tokenlen'],
-                                   summaryType='median'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sentenceThemes',
-                                   transformations=['tokenlen'],
-                                   summaryType='max'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sentenceThemes',
-                                   transformations=['tokenlen'],
-                                   summaryType='min'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='sentenceThemes',
-                                   transformations=['tokenlen'],
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='syntacticDepthsOfRhemes',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='syntacticDepthsOfRhemes',
-                                   summaryType='median'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='syntacticDepthsOfRhemes',
-                                   summaryType='max'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='syntacticDepthsOfRhemes',
-                                   summaryType='min'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='syntacticDepthsOfRhemes',
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='syntacticDepthsOfThemes',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='syntacticDepthsOfThemes',
-                                   summaryType='median'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='syntacticDepthsOfThemes',
-                                   summaryType='max'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='syntacticDepthsOfThemes',
-                                   summaryType='min'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='syntacticDepthsOfThemes',
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='weightedSyntacticDepth',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='weightedSyntacticDepth',
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='weightedSyntacticDepth',
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='weightedSyntacticDepth',
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='weightedSyntacticDepth',
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='weightedSyntacticBreadth',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='weightedSyntacticBreadth',
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='weightedSyntacticBreadth',
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='weightedSyntacticBreadth',
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='weightedSyntacticBreadth',
-                                   summaryType='stdev'),
+                    doc._.AWE_Info(indicator='nSyll',summaryType="mean"),
+                    doc._.AWE_Info(indicator='nSyll',summaryType="median"),
+                    doc._.AWE_Info(indicator='nSyll',summaryType="max"),
+                    doc._.AWE_Info(indicator='nSyll',summaryType="min"),
+                    doc._.AWE_Info(indicator='nSyll',summaryType="stdev"),
+                    doc._.AWE_Info(indicator='text', filters=[('is_alpha', ['True'])], transformations=['len', 'sqrt'], summaryType='mean'),
+                    doc._.AWE_Info(indicator='text', filters=[('is_alpha', ['True'])], transformations=['len', 'sqrt'], summaryType='median'),
+                    doc._.AWE_Info(indicator='text', filters=[('is_alpha', ['True'])], transformations=['len', 'sqrt'], summaryType='max'),
+                    doc._.AWE_Info(indicator='text', filters=[('is_alpha', ['True'])], transformations=['len', 'sqrt'], summaryType='min'),
+                    doc._.AWE_Info(indicator='text', filters=[('is_alpha', ['True'])], transformations=['len', 'sqrt'], summaryType='stdev'),
+                    doc._.AWE_Info(indicator='is_latinate',filters=[('is_alpha', ['True'])], summaryType="proportion"),
+                    doc._.AWE_Info(indicator='is_academic',filters=[('is_alpha', ['True'])], summaryType="proportion"),
+                    doc._.AWE_Info(indicator='family_size', filters=[('is_alpha', ['True'])], summaryType='mean'),
+                    doc._.AWE_Info(indicator='family_size', filters=[('is_alpha', ['True'])], summaryType='median'),
+                    doc._.AWE_Info(indicator='family_size', filters=[('is_alpha', ['True'])], summaryType='max'),
+                    doc._.AWE_Info(indicator='family_size', filters=[('is_alpha', ['True'])], summaryType='min'),
+                    doc._.AWE_Info(indicator='family_size', filters=[('is_alpha', ['True'])], summaryType='stdev'),
+                    doc._.AWE_Info(indicator='concreteness', filters=[('is_alpha', ['True'])], summaryType='mean'),
+                    doc._.AWE_Info(indicator='concreteness', filters=[('is_alpha', ['True'])], summaryType='median'),
+                    doc._.AWE_Info(indicator='concreteness', filters=[('is_alpha', ['True'])], summaryType='max'),
+                    doc._.AWE_Info(indicator='concreteness', filters=[('is_alpha', ['True'])], summaryType='min'),
+                    doc._.AWE_Info(indicator='concreteness', filters=[('is_alpha', ['True'])], summaryType='stdev'),
+                    doc._.AWE_Info(indicator='nSenses', filters=[('is_alpha', ['True'])], transformations=['log'], summaryType='mean'),
+                    doc._.AWE_Info(indicator='nSenses', filters=[('is_alpha', ['True'])], transformations=['log'], summaryType='median'),
+                    doc._.AWE_Info(indicator='nSenses', filters=[('is_alpha', ['True'])], transformations=['log'], summaryType='max'),
+                    doc._.AWE_Info(indicator='nSenses', filters=[('is_alpha', ['True'])], transformations=['log'], summaryType='min'),
+                    doc._.AWE_Info(indicator='nSenses', filters=[('is_alpha', ['True'])], transformations=['log'], summaryType='stdev'),
+                    doc._.AWE_Info(indicator='nMorph', filters=[('is_alpha', ['True'])], summaryType='mean'),
+                    doc._.AWE_Info(indicator='nMorph', filters=[('is_alpha', ['True'])], summaryType='median'),
+                    doc._.AWE_Info(indicator='nMorph', filters=[('is_alpha', ['True'])], summaryType='max'),
+                    doc._.AWE_Info(indicator='nMorph', filters=[('is_alpha', ['True'])], summaryType='min'),
+                    doc._.AWE_Info(indicator='nMorph', filters=[('is_alpha', ['True'])], summaryType='stdev'),
+                    doc._.AWE_Info(indicator='min_root_freq',filters=[('is_alpha', ['True'])],transformations=['log'],summaryType='mean'),
+                    doc._.AWE_Info(indicator='min_root_freq',filters=[('is_alpha', ['True'])],transformations=['log'],summaryType='median'),
+                    doc._.AWE_Info(indicator='min_root_freq',filters=[('is_alpha', ['True'])],transformations=['log'],summaryType='max'),
+                    doc._.AWE_Info(indicator='min_root_freq',filters=[('is_alpha', ['True'])],transformations=['log'],summaryType='min'),
+                    doc._.AWE_Info(indicator='min_root_freq',filters=[('is_alpha', ['True'])],transformations=['log'],summaryType='stdev'),
+                    doc._.AWE_Info(indicator='root_famSize',filters=[('is_alpha', ['True'])],summaryType='mean'),
+                    doc._.AWE_Info(indicator='root_famSize',filters=[('is_alpha', ['True'])],summaryType='median'),
+                    doc._.AWE_Info(indicator='root_famSize',filters=[('is_alpha', ['True'])],summaryType='max'),
+                    doc._.AWE_Info(indicator='root_famSize',filters=[('is_alpha', ['True'])],summaryType='min'),
+                    doc._.AWE_Info(indicator='root_famSize',filters=[('is_alpha', ['True'])],summaryType='stdev'),
+                    doc._.AWE_Info(indicator='root_pfmf',filters=[('is_alpha', ['True'])],summaryType='mean'),
+                    doc._.AWE_Info(indicator='root_pfmf',filters=[('is_alpha', ['True'])],summaryType='median'),
+                    doc._.AWE_Info(indicator='root_pfmf',filters=[('is_alpha', ['True'])],summaryType='max'),
+                    doc._.AWE_Info(indicator='root_pfmf',filters=[('is_alpha', ['True'])],summaryType='min'),
+                    doc._.AWE_Info(indicator='root_pfmf',filters=[('is_alpha', ['True'])],summaryType='stdev'),
+                    doc._.AWE_Info(indicator='token_freq',filters=[('is_alpha', ['True'])],summaryType='mean'),
+                    doc._.AWE_Info(indicator='token_freq',filters=[('is_alpha', ['True'])],summaryType='median'),
+                    doc._.AWE_Info(indicator='token_freq',filters=[('is_alpha', ['True'])],summaryType='max'),
+                    doc._.AWE_Info(indicator='token_freq',filters=[('is_alpha', ['True'])],summaryType='min'),
+                    doc._.AWE_Info(indicator='token_freq',filters=[('is_alpha', ['True'])],summaryType='stdev'),
+                    doc._.AWE_Info(indicator='lemma_freq',filters=[('is_alpha', ['True'])],summaryType='mean'),
+                    doc._.AWE_Info(indicator='lemma_freq',filters=[('is_alpha', ['True'])],summaryType='median'),
+                    doc._.AWE_Info(indicator='lemma_freq',filters=[('is_alpha', ['True'])],summaryType='max'),
+                    doc._.AWE_Info(indicator='lemma_freq',filters=[('is_alpha', ['True'])],summaryType='min'),
+                    doc._.AWE_Info(indicator='lemma_freq',filters=[('is_alpha', ['True'])],summaryType='stdev'),
+                    doc._.AWE_Info(indicator='max_freq',summaryType='mean'),
+                    doc._.AWE_Info(indicator='max_freq',summaryType='median'),
+                    doc._.AWE_Info(indicator='max_freq',summaryType='max'),
+                    doc._.AWE_Info(indicator='max_freq',summaryType='min'),
+                    doc._.AWE_Info(indicator='max_freq',summaryType='stdev'),
+                    doc._.AWE_Info(indicator='abstract_trait',filters=[('is_alpha', ['True'])], summaryType="proportion"),
+                    doc._.AWE_Info(indicator='animate',filters=[('is_alpha', ['True'])], summaryType="proportion"),
+                    doc._.AWE_Info(indicator='deictic',filters=[('is_alpha', ['True'])], summaryType="proportion"),
+                    doc._.AWE_Info(indicator='root', filters=[('is_alpha', ['True']),('is_stop', ['False']),('pos_', content_pos)], summaryType = 'total'),
+                    doc._.AWE_Info(indicator='lemma_', filters=[('is_alpha', ['True']),('is_stop', ['False']),('pos_', content_pos)], summaryType = 'total'),
+                    doc._.AWE_Info(indicator='lower_', filters=[('is_alpha', ['True']),('is_stop', ['False']),('pos_', content_pos)], summaryType = 'total'),
+                    doc._.AWE_Info(indicator='text', filters=[('is_alpha', ['True']),('is_stop', ['False']),('pos_', content_pos)], summaryType = 'total'),
+                    doc._.AWE_Info(infoType="Doc",indicator='delimiter_n',summaryType='total'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['tokenlen'],summaryType='mean'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['tokenlen'],summaryType='median'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['tokenlen'],summaryType='max'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['tokenlen'],summaryType='min'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['tokenlen'],summaryType='stdev'),
+                    doc._.AWE_Info(infoType="Doc",indicator='transitions',summaryType='proportion'),
+                    doc._.AWE_Info(infoType="Doc",indicator='transitions',summaryType='total'),
+                    doc._.AWE_Info(infoType="Doc",indicator='transitions',transformations=['text'],summaryType='counts'),
+                    doc._.AWE_Info(infoType="Doc",indicator='transition_distances',summaryType='mean'),
+                    doc._.AWE_Info(infoType="Doc",indicator='transition_distances',summaryType='median'),
+                    doc._.AWE_Info(infoType="Doc",indicator='transition_distances',summaryType='max'),
+                    doc._.AWE_Info(infoType="Doc",indicator='transition_distances',summaryType='min'),
+                    doc._.AWE_Info(infoType="Doc",indicator='transition_distances',summaryType='stdev'),
+                    doc._.AWE_Info(infoType="Doc",indicator='intersentence_cohesions',summaryType='mean'),
+                    doc._.AWE_Info(infoType="Doc",indicator='intersentence_cohesions',summaryType='median'),
+                    doc._.AWE_Info(infoType="Doc",indicator='intersentence_cohesions',summaryType='max'),
+                    doc._.AWE_Info(infoType="Doc",indicator='intersentence_cohesions',summaryType='min'),
+                    doc._.AWE_Info(infoType="Doc",indicator='intersentence_cohesions',summaryType='stdev'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sliding_window_cohesions',summaryType='mean'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sliding_window_cohesions',summaryType='median'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sliding_window_cohesions',summaryType='max'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sliding_window_cohesions',summaryType='min'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sliding_window_cohesions',summaryType='stdev'),
+                    doc._.AWE_Info(infoType="Doc",indicator='corefChainInfo',summaryType='counts'),
+                    doc._.AWE_Info(infoType="Doc",indicator='corefChainInfo',transformations=['len'],summaryType='mean'),
+                    doc._.AWE_Info(infoType="Doc",indicator='corefChainInfo',transformations=['len'],summaryType='median'),
+                    doc._.AWE_Info(infoType="Doc",indicator='corefChainInfo',transformations=['len'],summaryType='max'),
+                    doc._.AWE_Info(infoType="Doc",indicator='corefChainInfo',transformations=['len'],summaryType='min'),
+                    doc._.AWE_Info(infoType="Doc",indicator='corefChainInfo',transformations=['len'],summaryType='stdev'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',summaryType='counts'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['len'],summaryType='mean'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['len'],summaryType='median'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['len'],summaryType='max'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['len'],summaryType='min'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sents',transformations=['len'],summaryType='stdev'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sentenceThemes',transformations=['tokenlen'],summaryType='mean'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sentenceThemes',transformations=['tokenlen'],summaryType='median'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sentenceThemes',transformations=['tokenlen'],summaryType='max'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sentenceThemes',transformations=['tokenlen'],summaryType='min'),
+                    doc._.AWE_Info(infoType="Doc",indicator='sentenceThemes',transformations=['tokenlen'],summaryType='stdev'),
+                    doc._.AWE_Info(infoType="Doc",indicator='syntacticDepthsOfRhemes',summaryType='mean'),
+                    doc._.AWE_Info(infoType="Doc",indicator='syntacticDepthsOfRhemes',summaryType='median'),
+                    doc._.AWE_Info(infoType="Doc",indicator='syntacticDepthsOfRhemes',summaryType='max'),
+                    doc._.AWE_Info(infoType="Doc",indicator='syntacticDepthsOfRhemes',summaryType='min'),
+                    doc._.AWE_Info(infoType="Doc",indicator='syntacticDepthsOfRhemes',summaryType='stdev'),
+                    doc._.AWE_Info(infoType="Doc",indicator='syntacticDepthsOfThemes',summaryType='mean'),
+                    doc._.AWE_Info(infoType="Doc",indicator='syntacticDepthsOfThemes',summaryType='median'),
+                    doc._.AWE_Info(infoType="Doc",indicator='syntacticDepthsOfThemes',summaryType='max'),
+                    doc._.AWE_Info(infoType="Doc",indicator='syntacticDepthsOfThemes',summaryType='min'),
+                    doc._.AWE_Info(infoType="Doc",indicator='syntacticDepthsOfThemes',summaryType='stdev'),
+                    doc._.AWE_Info(indicator='weightedSyntacticDepth',summaryType='mean'),
+                    doc._.AWE_Info(indicator='weightedSyntacticDepth',summaryType='median'),
+                    doc._.AWE_Info(indicator='weightedSyntacticDepth',summaryType='max'),
+                    doc._.AWE_Info(indicator='weightedSyntacticDepth',summaryType='min'),
+                    doc._.AWE_Info(indicator='weightedSyntacticDepth',summaryType='stdev'),
+                    doc._.AWE_Info(indicator='weightedSyntacticBreadth',summaryType='mean'),
+                    doc._.AWE_Info(indicator='weightedSyntacticBreadth',summaryType='median'),
+                    doc._.AWE_Info(indicator='weightedSyntacticBreadth',summaryType='max'),
+                    doc._.AWE_Info(indicator='weightedSyntacticBreadth',summaryType='min'),
+                    doc._.AWE_Info(indicator='weightedSyntacticBreadth',summaryType='stdev'),
                     doc._.syntacticVariety,
-                    doc._.AWE_Info(indicator='in_past_tense_scope',
-                                   summaryType='proportion'),
-                    doc._.AWE_Info(indicator='vwp_argumentation',
-                                   summaryType='proportion'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='vwp_direct_speech',
-                                   summaryType='proportion'),
-                    doc._.AWE_Info(indicator='vwp_egocentric',
-                                   summaryType='proportion'),
-                    doc._.AWE_Info(indicator='vwp_allocentric',
-                                   summaryType='proportion'),
-                    doc._.AWE_Info(indicator='subjectivity',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='subjectivity',
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='subjectivity',
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='subjectivity',
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='subjectivity',
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='polarity',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='polarity',
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='polarity',
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='polarity',
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='polarity',
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='vwp_sentiment',
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='vwp_sentiment',
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='vwp_sentiment',
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='vwp_sentiment',
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='vwp_sentiment',
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='main_cluster_spans',
-                                   transformations=['len'],
-                                   summaryType='mean'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='main_cluster_spans',
-                                   transformations=['len'],
-                                   summaryType='median'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='main_cluster_spans',
-                                   transformations=['len'],
-                                   summaryType='min'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='main_cluster_spans',
-                                   transformations=['len'],
-                                   summaryType='max'),
-                    doc._.AWE_Info(infoType="Doc",
-                                   indicator='main_cluster_spans',
-                                   transformations=['len'],
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='devword', \
-                                   summaryType='proportion'),
-                    doc._.AWE_Info(indicator='nSyll', \
-                                   filters=[('is_alpha', ['True']),
-                                           ('devword', ['True'])], \
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='nSyll', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='nSyll', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='nSyll', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='nSyll', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='nMorph', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='nMorph', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='nMorph', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='nMorph', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='nMorph', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='nSenses', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='nSenses', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='nSenses', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='nSenses', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='nSenses', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='token_freq', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='token_freq', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='token_freq', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='token_freq', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='token_freq', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='stdev'),
-                    doc._.AWE_Info(indicator='concreteness', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='mean'),
-                    doc._.AWE_Info(indicator='concreteness', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='median'),
-                    doc._.AWE_Info(indicator='concreteness', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='min'),
-                    doc._.AWE_Info(indicator='concreteness', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='max'),
-                    doc._.AWE_Info(indicator='concreteness', \
-                                   filters=[('is_alpha', ['True']),
-                                            ('devword', ['True'])], \
-                                   summaryType='stdev')]
+                    doc._.AWE_Info(indicator='in_past_tense_scope',summaryType='proportion'),
+                    doc._.AWE_Info(indicator='vwp_argumentation',summaryType='proportion'),
+                    doc._.AWE_Info(infoType="Doc",indicator='vwp_direct_speech',summaryType='proportion'),
+                    doc._.AWE_Info(indicator='vwp_egocentric',summaryType='proportion'),
+                    doc._.AWE_Info(indicator='vwp_allocentric',summaryType='proportion'),
+                    doc._.AWE_Info(indicator='subjectivity',summaryType='mean'),
+                    doc._.AWE_Info(indicator='subjectivity',summaryType='median'),
+                    doc._.AWE_Info(indicator='subjectivity',summaryType='min'),
+                    doc._.AWE_Info(indicator='subjectivity',summaryType='max'),
+                    doc._.AWE_Info(indicator='subjectivity',summaryType='stdev'),
+                    doc._.AWE_Info(indicator='polarity',summaryType='mean'),
+                    doc._.AWE_Info(indicator='polarity',summaryType='median'),
+                    doc._.AWE_Info(indicator='polarity',summaryType='min'),
+                    doc._.AWE_Info(indicator='polarity',summaryType='max'),
+                    doc._.AWE_Info(indicator='polarity',summaryType='stdev'),
+                    doc._.AWE_Info(indicator='vwp_sentiment',summaryType='mean'),
+                    doc._.AWE_Info(indicator='vwp_sentiment',summaryType='median'),
+                    doc._.AWE_Info(indicator='vwp_sentiment',summaryType='min'),
+                    doc._.AWE_Info(indicator='vwp_sentiment',summaryType='max'),
+                    doc._.AWE_Info(indicator='vwp_sentiment',summaryType='stdev'),
+                    doc._.AWE_Info(infoType="Doc",indicator='main_cluster_spans',transformations=['len'],summaryType='mean'),
+                    doc._.AWE_Info(infoType="Doc",indicator='main_cluster_spans',transformations=['len'],summaryType='median'),
+                    doc._.AWE_Info(infoType="Doc",indicator='main_cluster_spans',transformations=['len'],summaryType='min'),
+                    doc._.AWE_Info(infoType="Doc",indicator='main_cluster_spans',transformations=['len'],summaryType='max'),
+                    doc._.AWE_Info(infoType="Doc",indicator='main_cluster_spans',transformations=['len'],summaryType='stdev'),
+                    doc._.AWE_Info(indicator='devword', summaryType='proportion'),
+                    doc._.AWE_Info(indicator='nSyll', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='mean'),
+                    doc._.AWE_Info(indicator='nSyll', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='median'),
+                    doc._.AWE_Info(indicator='nSyll', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='min'),
+                    doc._.AWE_Info(indicator='nSyll', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='max'),
+                    doc._.AWE_Info(indicator='nSyll', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='stdev'),
+                    doc._.AWE_Info(indicator='nMorph', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='mean'),
+                    doc._.AWE_Info(indicator='nMorph', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='median'),
+                    doc._.AWE_Info(indicator='nMorph', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='min'),
+                    doc._.AWE_Info(indicator='nMorph', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='max'),
+                    doc._.AWE_Info(indicator='nMorph', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='stdev'),
+                    doc._.AWE_Info(indicator='nSenses', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='mean'),
+                    doc._.AWE_Info(indicator='nSenses', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='median'),
+                    doc._.AWE_Info(indicator='nSenses', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='min'),
+                    doc._.AWE_Info(indicator='nSenses', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='max'),
+                    doc._.AWE_Info(indicator='nSenses', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='stdev'),
+                    doc._.AWE_Info(indicator='token_freq', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='mean'),
+                    doc._.AWE_Info(indicator='token_freq', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='median'),
+                    doc._.AWE_Info(indicator='token_freq', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='min'),
+                    doc._.AWE_Info(indicator='token_freq', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='max'),
+                    doc._.AWE_Info(indicator='token_freq', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='stdev'),
+                    doc._.AWE_Info(indicator='concreteness', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='mean'),
+                    doc._.AWE_Info(indicator='concreteness', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='median'),
+                    doc._.AWE_Info(indicator='concreteness', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='min'),
+                    doc._.AWE_Info(indicator='concreteness', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='max'),
+                    doc._.AWE_Info(indicator='concreteness', filters=[('is_alpha', ['True']),('devword', ['True'])], summaryType='stdev')
+                ]
                 await websocket.send(json.dumps(summaryFeats))
             else:
                 await websocket.send(False)
