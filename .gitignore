@@ -1,0 +1,5 @@
+# Ignore the pycache and egg python directories
+__pycache__/
+*.egg-info/
+*.egg
+build/
