@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import asyncio
 import csv
 import os
 import math
@@ -40,7 +41,7 @@ def initialize():
     # return spellchecker and parser objects
     return cs, parser, lt
 
-if __name__ == '__main__':
+async def main():
 
     parser = argparse.ArgumentParser(description="Parse a student text file")
     parser.add_argument(
@@ -67,7 +68,7 @@ if __name__ == '__main__':
             doc_contents.append(contents)
 
     print('Running LanguageTool')
-    df1 = lt.summarizeMultipleTexts(ids, doc_contents)
+    df1 = await lt.summarizeMultipleTexts(ids, doc_contents)
     
     #texts = None
     print('Running spellcorrect')
@@ -117,3 +118,7 @@ if __name__ == '__main__':
     dfFinal = pd.merge(df2, pd.merge(df1,syntactic_profile, on='ID'), on='ID')
     dfFinal.to_csv(args.directory + "/output.csv")
 
+
+
+if __name__ == '__main__':
+    asyncio.run(main())

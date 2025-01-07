@@ -40,27 +40,47 @@
 # module that rougly identifies main ideas/supporting ideas/details in
 # argument-style texts.
 
-pipeline_def = [{'package': 'spacytextblob',
-                 'module': 'spacytextblob',
-                 'component': 'spacytextblob',
-                 'language': ['en']},
-                {'package': 'awe_components.components',
-                 'module': 'lexicalFeatures',
-                 'component': 'lexicalfeatures',
-                 'language': ['en']},
-                {'package': 'awe_components.components',
-                 'module': 'syntaxDiscourseFeats',
-                 'component': 'syntaxdiscoursefeatures',
-                 'language': ['en']},
-                {'package': 'awe_components.components',
-                 'module': 'viewpointFeatures',
-                 'component': 'viewpointfeatures',
-                 'language': ['en']},
-                {'package': 'awe_components.components',
-                 'module': 'lexicalClusters',
-                 'component': 'lexicalclusters',
-                 'language': ['en']},
-                {'package': 'awe_components.components',
-                 'module': 'contentSegmentation',
-                 'component': 'contentsegmentation',
-                 'language': ['en']}]
+pipeline_def = [
+    {
+        'package': 'spacytextblob',
+        'module': 'spacytextblob',
+        'component': 'spacytextblob',
+        'language': ['en']
+    },
+    {
+        'package': 'coreferee',
+        'module': 'coreferee',
+        'component': 'coreferee',
+        'language': ['en']
+    },
+    {
+        'package': 'awe_components.components',
+        'module': 'lexicalFeatures',
+        'component': 'lexicalfeatures',
+        'language': ['en']
+    },
+    {
+        'package': 'awe_components.components',
+        'module': 'syntaxDiscourseFeats',
+        'component': 'syntaxdiscoursefeatures',
+        'language': ['en']
+    },
+    {
+        'package': 'awe_components.components',
+        'module': 'viewpointFeatures',
+        'component': 'viewpointfeatures',
+        'language': ['en']
+    },
+    {
+        'package': 'awe_components.components',
+        'module': 'lexicalClusters',
+        'component': 'lexicalclusters',
+        'language': ['en']
+    },
+    {
+        'package': 'awe_components.components',
+        'module': 'contentSegmentation',
+        'component': 'contentsegmentation',
+        'language': ['en']
+    }
+]
