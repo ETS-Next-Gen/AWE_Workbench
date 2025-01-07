@@ -1,15 +1,23 @@
-#!/usr/bin/env python3.10
-# Copyright 2022, Educational Testing Service
+"""
+--- [ Test: startServers.py ] -----------------------------------------------------------
 
-import asyncio
-import websocket
+Code for kicking off the parserServer.
+
+Author: Caleb Scott (cwscott3@ncsu.edu)
+
+Copyright 2022, Educational Testing Service
+
+-----------------------------------------------------------------------------------------
+"""
+
+# --- [ IMPORTS ] -----------------------------------------------------------------------
+
 import json
 from websocket import create_connection
 
+# --- [ CLASSES ] -----------------------------------------------------------------------
 
 class websocketClient:
-
-    uri = None
 
     def __init__(self):
         self.uri = "ws://localhost:8765"
@@ -44,8 +52,11 @@ class websocketClient:
             print(e)
             return None
 
+# --- [ MAIN ] --------------------------------------------------------------------------
 
 if __name__ == '__main__':
     wsc = websocketClient()
     test = wsc.check(['The grrls are happpy.'])
     print(test)
+
+# --- [ END ] ---------------------------------------------------------------------------
